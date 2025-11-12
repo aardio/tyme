@@ -1,0 +1,17 @@
+import console;
+import time.tyme;//测试版本，暂时还不完善
+
+var SolarDay = time.tyme.SolarDay;
+ 
+var solar = SolarDay.fromYmd(1986, 5, 29);
+ 
+// 1986年5月29日
+console.log( tostring(solar) ); //console.log 的参数可以省略 tostring 调用。
+
+// 农历丙寅年四月廿一
+console.log( tostring(solar.getLunarDay()) );
+
+// 第十七饶迥火虎年四月廿一
+console.log( tostring(solar.getRabByungDay()) );
+
+console.pause();
