@@ -169,7 +169,7 @@ class SolarTerm {
         var y = self.numeric(year, 'lunar year');
         if(type(indexOrName) == "number"){
             var size = #self.NAMES;
-            y = ..math.floor((y * size + indexOrName) / size);
+            y = ..math.modf((y * size + indexOrName) / size);
         }
         var jd = ..math.floor((y - 2000) * 365.2422 + 180);
         var w = ..math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355;
@@ -183,7 +183,7 @@ class SolarTerm {
     next = function(n){
         var size = owner.getSize();
         var i = owner.index + n;
-        return self.fromIndex(..math.floor((owner.year * size + i) / size), owner.indexOfBy(i));
+        return self.fromIndex(..math.modf((owner.year * size + i) / size), owner.indexOfBy(i));
     }
 
     isJie = function(){
@@ -362,7 +362,7 @@ class SolarHalfYear {
 
     next = function(n){
         var i = owner.index + n;
-        return self.fromIndex(..math.floor((owner.getYear() * 2 + i) / 2), owner.indexOf(i, 2));
+        return self.fromIndex(..math.modf((owner.getYear() * 2 + i) / 2), owner.indexOf(i, 2));
     }
 
     getMonths = function(){
@@ -431,7 +431,7 @@ class SolarSeason {
 
     next = function(n){
         var i = owner.index + n;
-        return self.fromIndex(..math.floor((owner.getYear() * 4 + i) / 4), owner.indexOf(i, 4));
+        return self.fromIndex(..math.modf((owner.getYear() * 4 + i) / 4), owner.indexOf(i, 4));
     }
 
     getMonths = function(){
@@ -509,7 +509,7 @@ class SolarMonth {
     }
 
     getSeason = function(){
-        return SolarSeason.fromIndex(owner.getYear(), ..math.floor(owner.getIndexInYear() / 3));
+        return SolarSeason.fromIndex(owner.getYear(), ..math.modf(owner.getIndexInYear() / 3));
     }
 
     getWeekCount = function(start){
@@ -526,7 +526,7 @@ class SolarMonth {
 
     next = function(n){
         var i = owner.month - 1 + n;
-        return self.fromYm(..math.floor((owner.getYear() * 12 + i) / 12), owner.indexOf(i, 12) + 1);
+        return self.fromYm(..math.modf((owner.getYear() * 12 + i) / 12), owner.indexOf(i, 12) + 1);
     }
 
     getWeeks = function(start){
@@ -682,6 +682,15 @@ namespace SolarWeek {
 // SolarDay 类
 class SolarDay {
     ctor(year, month, day){
+        if(year === null ) year = ..time();
+
+        if( ..time.istime(year) ){
+            var tm = year;
+            year = tm.year
+            month = tm.month
+            day = tm.day
+        }
+
         this = AbstractTyme();
         var d = self.numeric(day, 'solar day');
         if(d < 1){
@@ -788,7 +797,7 @@ class SolarDay {
     getPhenologyDay = function(){
         var d = owner.getTermDay();
         var dayIndex = d.getDayIndex();
-        var index = ..math.floor(dayIndex / 5);
+        var index = ..math.modf(dayIndex / 5);
         if(index > 2){
             index = 2;
         }
@@ -896,7 +905,7 @@ class SolarDay {
             return null;
         }
         var days = owner.subtract(start);
-        return NineDay(Nine.fromIndex(..math.floor(days / 9)), days % 9);
+        return NineDay(Nine.fromIndex(..math.modf(days / 9)), days % 9);
     }
 
     getIndexInYear = function(){
@@ -904,7 +913,7 @@ class SolarDay {
     }
 
     subtract = function(target){
-        return ..math.floor(owner.getJulianDay().subtract(target.getJulianDay()));
+        return ..math.modf(owner.getJulianDay().subtract(target.getJulianDay()));
     }
 
     getJulianDay = function(){
@@ -1036,19 +1045,19 @@ class SolarTime {
             return self.fromYmdHms(owner.getYear(), owner.getMonth(), owner.getDay(), owner.hour, owner.minute, owner.second);
         }
         var ts = owner.second + n;
-        var tm = owner.minute + ..math.floor(ts / 60);
+        var tm = owner.minute + ..math.modf(ts / 60);
         ts %= 60;
         if(ts < 0){
             ts += 60;
             tm -= 1;
         }
-        var th = owner.hour + ..math.floor(tm / 60);
+        var th = owner.hour + ..math.modf(tm / 60);
         tm %= 60;
         if(tm < 0){
             tm += 60;
             th -= 1;
         }
-        var td = ..math.floor(th / 24);
+        var td = ..math.modf(th / 24);
         th %= 24;
         if(th < 0){
             th += 24;
@@ -1209,7 +1218,7 @@ class TwentyEightStar {
     }
 
     getZone = function(){
-        return Zone.fromIndex(..math.floor(owner.index / 7));
+        return Zone.fromIndex(..math.modf(owner.index / 7));
     }
 
     getAnimal = function(){
@@ -1701,7 +1710,7 @@ class Phase {
     ctor(lunarYear, lunarMonth, indexOrName){
         this = LoopTyme(self.NAMES, indexOrName);
         if(type(indexOrName) == "number"){
-            var m = LunarMonth.fromYm(lunarYear, lunarMonth).next(..math.floor(indexOrName / this.getSize()));
+            var m = LunarMonth.fromYm(lunarYear, lunarMonth).next(..math.modf(indexOrName / this.getSize()));
             this.lunarYear = m.getYear();
             this.lunarMonth = m.getMonthWithLeap();
         }
@@ -1717,7 +1726,7 @@ class Phase {
         if(i < 0){
             i -= size;
         }
-        i = ..math.floor(i / size);
+        i = ..math.modf(i / size);
         var m = LunarMonth.fromYm(owner.lunarYear, owner.lunarMonth);
         if(i != 0){
             m = m.next(i);
@@ -1738,7 +1747,7 @@ class Phase {
             i++;
         }
         var r = [0, 90, 180, 270];
-        t = ShouXingUtil.msaLonT((n + i + r[..math.floor(owner.getIndex() / 2) + 1] / 360.0) * ShouXingUtil.PI_2) * 36525;
+        t = ShouXingUtil.msaLonT((n + i + r[..math.modf(owner.getIndex() / 2) + 1] / 360.0) * ShouXingUtil.PI_2) * 36525;
         return JulianDay.fromJulianDay(jd + t - ShouXingUtil.dtT(t)).getSolarTime();
     }
 
@@ -2010,7 +2019,7 @@ class Twenty {
     }
 
     getSixty = function(){
-        return Sixty.fromIndex(..math.floor(owner.index / 3));
+        return Sixty.fromIndex(..math.modf(owner.index / 3));
     }
 }
 
@@ -2213,7 +2222,7 @@ class HeavenStem {
     }
 
     getElement = function(){
-        return Element.fromIndex(..math.floor(owner.index / 2));
+        return Element.fromIndex(..math.modf(owner.index / 2));
     }
 
     getYinYang = function(){
@@ -2250,7 +2259,7 @@ class HeavenStem {
 
     getWealthDirection = function(){
         var wealths = [7,1,0,2,8];
-        return Direction.fromIndex(wealths[..math.floor(owner.index / 2) + 1]);
+        return Direction.fromIndex(wealths[..math.modf(owner.index / 2) + 1]);
     }
 
     getMascotDirection = function(){
@@ -2587,7 +2596,7 @@ class SixtyCycle {
     }
 
     getSound = function(){
-        return Sound.fromIndex(..math.floor(owner.index / 2));
+        return Sound.fromIndex(..math.modf(owner.index / 2));
     }
 
     getPengZu = function(){
@@ -2595,7 +2604,7 @@ class SixtyCycle {
     }
 
     getTen = function(){
-        return Ten.fromIndex(..math.floor((owner.getHeavenStem().getIndex() - owner.getEarthBranch().getIndex()) / 2));
+        return Ten.fromIndex(..math.modf((owner.getHeavenStem().getIndex() - owner.getEarthBranch().getIndex()) / 2));
     }
 
     getExtraEarthBranches = function(){
@@ -2888,7 +2897,7 @@ class Phenology {
         this = LoopTyme(self.NAMES, indexOrName);
         if(type(indexOrName) == "number"){
             var size = this.getSize();
-            this.year = ..math.floor((year * size + indexOrName) / size);
+            this.year = ..math.modf((year * size + indexOrName) / size);
         }
         else {
             this.year = year;
@@ -2898,7 +2907,7 @@ class Phenology {
     next = function(n){
         var size = owner.getSize();
         var i = owner.getIndex() + n;
-        return self.fromIndex(..math.floor((owner.year * size + i) / size), owner.indexOf(i, size));
+        return self.fromIndex(..math.modf((owner.year * size + i) / size), owner.indexOf(i, size));
     }
 
     getYear = function(){
@@ -3274,7 +3283,7 @@ namespace LunarYear {
         for(i=1; 12){
             var n = 0;
             var m = months[i];
-            var size = ..math.floor(#m / 2);
+            var size = ..math.modf(#m / 2);
             var l = {};
             for(y=1; size){
                 var z = (y - 1) * 2;
@@ -3402,7 +3411,7 @@ class LunarMonth {
             w += 29.5306 * (offset + index);
             var firstDay = ShouXingUtil.calcShuo(w);
             this.firstJulianDay = JulianDay.fromJulianDay(JulianDay.J2000 + firstDay);
-            this.dayCount = ..math.floor(ShouXingUtil.calcShuo(w + 29.5306) - firstDay);
+            this.dayCount = ..math.modf(ShouXingUtil.calcShuo(w + 29.5306) - firstDay);
             this.year = currentYear;
             this.month = m;
             this.leap = leap;
@@ -3774,7 +3783,7 @@ class LunarDay {
     }
 
     getSixtyCycle = function(){
-        var offset = ..math.floor(owner.month.getFirstJulianDay().next(owner.day - 12).getDay());
+        var offset = ..math.modf(owner.month.getFirstJulianDay().next(owner.day - 12).getDay());
         return SixtyCycle.fromName(HeavenStem.fromIndex(offset).getName() ++ EarthBranch.fromIndex(offset).getName());
     }
 
@@ -3816,7 +3825,7 @@ class LunarDay {
 
     getJupiterDirection = function(){
         var index = owner.getSixtyCycle().getIndex();
-        return index % 12 < 6 ? Element.fromIndex(..math.floor(index / 12)).getDirection() : owner.month.getLunarYear().getJupiterDirection();
+        return index % 12 < 6 ? Element.fromIndex(..math.modf(index / 12)).getDirection() : owner.month.getLunarYear().getJupiterDirection();
     }
 
     getFetusDay = function(){
@@ -4146,7 +4155,7 @@ class SixtyCycleDay {
 
     getJupiterDirection = function(){
         var index = owner.getSixtyCycle().getIndex();
-        return index % 12 < 6 ? Element.fromIndex(..math.floor(index / 12)).getDirection() : owner.month.getSixtyCycleYear().getJupiterDirection();
+        return index % 12 < 6 ? Element.fromIndex(..math.modf(index / 12)).getDirection() : owner.month.getSixtyCycleYear().getJupiterDirection();
     }
 
     getFetusDay = function(){
@@ -4280,7 +4289,7 @@ class SixtyCycleHour {
 
     getIndexInDay = function(){
         var h = owner.solarTime.getHour();
-        return h === 23 ? 0 : ..math.floor((h + 1) / 2);
+        return h === 23 ? 0 : ..math.modf((h + 1) / 2);
     }
 
     next = function(n){
@@ -4363,7 +4372,7 @@ class ThreePillars {
         m *= 2;
         var baseYear = startYear - 1;
         if(baseYear > y){
-            y += 60 * ..math.floor(..math.ceil((baseYear - y) / 60.0));
+            y += 60 * ..math.modf(..math.ceil((baseYear - y) / 60.0));
         }
         while(y <= endYear){
             var term = SolarTerm.fromIndex(y, 3);
@@ -4451,7 +4460,7 @@ class LunarHour {
     }
 
     getIndexInDay = function(){
-        return ..math.floor((owner.hour + 1) / 2);
+        return ..math.modf((owner.hour + 1) / 2);
     }
 
     next = function(n){
@@ -4461,7 +4470,7 @@ class LunarHour {
         var h = owner.hour + n * 2;
         var diff = h < 0 ? -1 : 1;
         var hour = ..math.abs(h);
-        var days = ..math.floor(hour / 24) * diff;
+        var days = ..math.modf(hour / 24) * diff;
         hour = (hour % 24) * diff;
         if(hour < 0){
             hour += 24;
@@ -4608,18 +4617,18 @@ class JulianDay {
     }
 
     getSolarTime = function(){
-        var d = ..math.floor(owner.day + 0.5);
+        var d = ..math.modf(owner.day + 0.5);
         var f = owner.day + 0.5 - d;
 
         if(d >= 2299161){
-            var c = ..math.floor((d - 1867216.25) / 36524.25);
-            d += 1 + c - ..math.floor(c * 0.25);
+            var c = ..math.modf((d - 1867216.25) / 36524.25);
+            d += 1 + c - ..math.modf(c * 0.25);
         }
         d += 1524;
-        var y = ..math.floor((d - 122.1) / 365.25);
-        d -= ..math.floor(365.25 * y);
-        var m = ..math.floor(d / 30.601);
-        d -= ..math.floor(30.601 * m);
+        var y = ..math.modf((d - 122.1) / 365.25);
+        d -= ..math.modf(365.25 * y);
+        var m = ..math.modf(d / 30.601);
+        d -= ..math.modf(30.601 * m);
         if(m > 13){
             m -= 12;
         }
@@ -4629,20 +4638,20 @@ class JulianDay {
         m -= 1;
         y -= 4715;
         f *= 24;
-        var hour = ..math.floor(f);
+        var hour = ..math.modf(f);
 
         f -= hour;
         f *= 60;
-        var minute = ..math.floor(f);
+        var minute = ..math.modf(f);
 
         f -= minute;
         f *= 60;
-        var second = ..math.floor(f + 0.5);
+        var second = ..math.modf(f + 0.5);
         return second < 60 ? SolarTime.fromYmdHms(y, m, d, hour, minute, second) : SolarTime.fromYmdHms(y, m, d, hour, minute, second - 60).next(60);
     }
 
     getWeek = function(){
-        return Week.fromIndex(..math.floor(owner.day + 0.5) + 7000001);
+        return Week.fromIndex(..math.modf(owner.day + 0.5) + 7000001);
     }
 
     subtract = function(target){
@@ -4655,6 +4664,7 @@ Phase.JulianDay = JulianDay;
 LunarMonth.JulianDay = JulianDay;
 SolarDay.JulianDay = JulianDay;
 Phenology.JulianDay = JulianDay;
+SolarTerm.JulianDay = JulianDay;
 
 namespace JulianDay {
     J2000 = 2451545;
@@ -4671,16 +4681,16 @@ namespace JulianDay {
         var s = self.numeric(second, 'second');
         var d = self.numeric(day, 'day') + ((s / 60 + i) / 60 + h) / 24;
         var n = 0;
-        var g = y * 372 + m * 31 + ..math.floor(d) >= 588829;
+        var g = y * 372 + m * 31 + ..math.modf(d) >= 588829;
         if(m <= 2){
             m += 12;
             y--;
         }
         if(g){
-            n = ..math.floor(y * 0.01);
-            n = 2 - n + ..math.floor(n * 0.25);
+            n = ..math.modf(y * 0.01);
+            n = 2 - n + ..math.modf(n * 0.25);
         }
-        return self.fromJulianDay(..math.floor(365.25 * (y + 4716)) + ..math.floor(30.6001 * (m + 1)) + d + n - 1524.5);
+        return self.fromJulianDay(..math.modf(365.25 * (y + 4716)) + ..math.modf(30.6001 * (m + 1)) + d + n - 1524.5);
     }
 
     indexOf = AbstractTyme.indexOf;
@@ -5067,8 +5077,8 @@ namespace ShouXingUtil {
         var n0;
         var m0 = self.XL0[3] - self.XL0[2];
         for(i=1; 6){
-            n1 = ..math.floor(self.XL0[1 + i]);
-            n2 = ..math.floor(self.XL0[2 + i]);
+            n1 = ..math.modf(self.XL0[1 + i]);
+            n2 = ..math.modf(self.XL0[2 + i]);
             n0 = n2 - n1;
             if(n0 === 0){
                 tn *= t;
@@ -5078,7 +5088,7 @@ namespace ShouXingUtil {
                 m = n2;
             }
             else {
-                m = ..math.floor((3 * n * n0 / m0 + 0.5) + n1);
+                m = ..math.modf((3 * n * n0 / m0 + 0.5) + n1);
                 if(i != 1){
                     m += 3;
                 }
@@ -5125,7 +5135,7 @@ namespace ShouXingUtil {
         for(i=1; #self.XL1){
             var f = self.XL1[i];
             var l = #f;
-            var m = ..math.floor((n * l / obl + 0.5));
+            var m = ..math.modf((n * l / obl + 0.5));
             if(i > 1){
                 m += 6;
             }
@@ -5223,8 +5233,8 @@ namespace ShouXingUtil {
     }
 
     msaLonT2 = function(w){
-        var v,t = 7771.37714500204;
-        t = (w + 1.08472) / v;
+        var v = 7771.37714500204;
+        var t = (w + 1.08472) / v;
         var t2 = t * t;
         t -= (-0.00003309 * t2 + 0.10976 * ..math.cos(0.784758 + 8328.6914246 * t + 0.000152292 * t2) + 0.02224 * ..math.cos(0.18740 + 7214.0628654 * t - 0.00021848 * t2) - 0.03342 * ..math.cos(4.669257 + 628.307585 * t)) / v;
         t2 = t * t;
@@ -5288,7 +5298,7 @@ namespace ShouXingUtil {
                 }
             }
             d = self.SHUO_KB[i] + self.SHUO_KB[i + 1] * ..math.floor((jd + pc - self.SHUO_KB[i]) / self.SHUO_KB[i + 1]);
-            d = ..math.floor(d + 0.5);
+            d = ..math.fxloor(d + 0.5);
             if(d === 1683460){
                 d++;
             }
@@ -5533,7 +5543,7 @@ class SolarFestival {
     next = function(n){
         var size = #self.NAMES;
         var i = owner.index + n;
-        return self.fromIndex(..math.floor((owner.day.getYear() * size + i) / size), owner.indexOf(i, size));
+        return self.fromIndex(..math.modf((owner.day.getYear() * size + i) / size), owner.indexOf(i, size));
     }
 }
 
@@ -5618,7 +5628,7 @@ class LunarFestival {
     next = function(n){
         var size = #self.NAMES;
         var i = owner.index + n;
-        return self.fromIndex(..math.floor((owner.day.getYear() * size + i) / size), owner.indexOf(i, size));
+        return self.fromIndex(..math.modf((owner.day.getYear() * size + i) / size), owner.indexOf(i, size));
     }
 }
 
@@ -5777,7 +5787,7 @@ class EightChar {
         var hours = h == 0 ? [0,23] : [h];
         var baseYear = startYear - 1;
         if(baseYear > y){
-            y += 60 * ..math.floor(..math.ceil((baseYear - y) / 60.0));
+            y += 60 * ..math.modf(..math.ceil((baseYear - y) / 60.0));
         }
         while(y <= endYear){
             var term = SolarTerm.fromIndex(y, 3);
@@ -5883,11 +5893,11 @@ class AbstractChildLimitProvider {
         var h = birthTime.getHour() + addHour;
         var mi = birthTime.getMinute() + addMinute;
         var s = birthTime.getSecond() + addSecond;
-        mi += ..math.floor(s / 60);
+        mi += ..math.modf(s / 60);
         s %= 60;
-        h += ..math.floor(mi / 60);
+        h += ..math.modf(mi / 60);
         mi %= 60;
-        d += ..math.floor(h / 24);
+        d += ..math.modf(h / 24);
         h %= 24;
 
         var sm = SolarMonth.fromYm(birthTime.getYear() + addYear, birthTime.getMonth()).next(addMonth);
@@ -5917,13 +5927,13 @@ class DefaultChildLimitProvider {
 
     getInfo = function(birthTime, term){
         var seconds = ..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime));
-        var year = ..math.floor(seconds / 259200);
+        var year = ..math.modf(seconds / 259200);
         seconds %= 259200;
-        var month = ..math.floor(seconds / 21600);
+        var month = ..math.modf(seconds / 21600);
         seconds %= 21600;
-        var day = ..math.floor(seconds / 720);
+        var day = ..math.modf(seconds / 720);
         seconds %= 720;
-        var hour = ..math.floor(seconds / 30);
+        var hour = ..math.modf(seconds / 30);
         seconds %= 30;
         var minute = seconds * 2;
 
@@ -5944,12 +5954,12 @@ class China95ChildLimitProvider {
     }
 
     getInfo = function(birthTime, term){
-        var minutes = ..math.floor(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
-        var year = ..math.floor(minutes / 4320);
+        var minutes = ..math.modf(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
+        var year = ..math.modf(minutes / 4320);
         minutes %= 4320;
-        var month = ..math.floor(minutes / 360);
+        var month = ..math.modf(minutes / 360);
         minutes %= 360;
-        var day = ..math.floor(minutes / 12);
+        var day = ..math.modf(minutes / 12);
         return owner.next(birthTime, year, month, day, 0, 0, 0);
     }
 }
@@ -5982,10 +5992,10 @@ class LunarSect1ChildLimitProvider {
             hourDiff += 12;
             dayDiff--;
         }
-        var monthDiff = ..math.floor(hourDiff * 10 / 30);
+        var monthDiff = ..math.modf(hourDiff * 10 / 30);
         var month = dayDiff * 4 + monthDiff;
         var day = hourDiff * 10 - monthDiff * 30;
-        var year = ..math.floor(month / 12);
+        var year = ..math.modf(month / 12);
         month = month - year * 12;
         return owner.next(birthTime, year, month, day, 0, 0, 0);
     }
@@ -6004,12 +6014,12 @@ class LunarSect2ChildLimitProvider {
     }
 
     getInfo = function(birthTime, term){
-        var minutes = ..math.floor(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
-        var year = ..math.floor(minutes / 4320);
+        var minutes = ..math.modf(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
+        var year = ..math.modf(minutes / 4320);
         minutes %= 4320;
-        var month = ..math.floor(minutes / 360);
+        var month = ..math.modf(minutes / 360);
         minutes %= 360;
-        var day = ..math.floor(minutes / 12);
+        var day = ..math.modf(minutes / 12);
         minutes %= 12;
         var hour = minutes * 2;
         return owner.next(birthTime, year, month, day, hour, 0, 0);
