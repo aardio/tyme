@@ -458,19 +458,6 @@ namespace SolarSeason {
 }
 var SolarSeason = SolarSeason;
 
-/*****intellisense(time.tyme)
-SolarTerm = 节气
-SolarTerm.fromIndex(.(year,index) = 根据年份和索引创建节气对象\n参数 @year 为年份\n参数 @index 为节气索引(0-23)
-SolarTerm.fromName(.(year,name) = 根据年份和名称创建节气对象\n参数 @year 为年份\n参数 @name 为节气名称
-SolarTermDay = 节气日
-SolarYear = 公历年
-SolarYear.fromYear(.(year) = 根据年份创建公历年对象\n参数 @year 为年份(1-9999)
-SolarHalfYear = 公历半年
-SolarHalfYear.fromIndex(.(year,index) = 根据年份和索引创建公历半年对象\n参数 @year 为年份\n参数 @index 为半年索引(0-1)
-SolarSeason = 公历季度
-SolarSeason.fromIndex(.(year,index) = 根据年份和索引创建公历季度对象\n参数 @year 为年份\n参数 @index 为季度索引(0-3)
-end intellisense*****/
-
 // SolarMonth 类
 class SolarMonth {
     ctor(year, month){
@@ -1152,18 +1139,6 @@ namespace SolarTime {
     numeric = AbstractTyme.numeric;
 }
 
-
-/*****intellisense(time.tyme)
-SolarMonth = 公历月
-SolarMonth.fromYm(.(year,month) = 根据年月创建公历月对象\n参数 @year 为年份\n参数 @month 为月份(1-12)
-SolarWeek = 公历周
-SolarWeek.fromYm(.(year,month,index,start) = 根据年月周索引创建公历周对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @index 为周索引(0-5)\n参数 @start 为起始星期
-SolarDay = 公历日
-SolarDay.fromYmd(.(year,month,day) = 根据年月日创建公历日对象\n参数 @year 为年份\n参数 @month 为月份(1-12)\n参数 @day 为日期(1-31)
-SolarTime = 公历时间
-SolarTime.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建公历时间对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)
-end intellisense*****/
-
 // Animal 类
 class Animal {
     ctor(indexOrName){
@@ -1581,54 +1556,6 @@ namespace Element {
     numeric = LoopTyme.numeric;
 }
 
-/*****intellisense()
-time.tyme = 万年历与农历支持库
-end intellisense*****/
-
-/*****intellisense(time.tyme)
-YinYang = 阴阳枚举\n@.YIN 阴\n@.YANG 阳
-Side = 方位枚举\n@.IN 内\n@.OUT 外
-Gender = 性别枚举\n@.WOMAN 女\n@.MAN 男
-FestivalType = 节日类型枚举\n@.DAY 日\n@.TERM 节气\n@.EVE 除夕
-HideHeavenStemType = 藏干类型枚举\n@.RESIDUAL 余气\n@.MIDDLE 中气\n@.MAIN 本气
-Animal = 二十八宿动物
-Animal.fromIndex(.(index) = 根据索引创建二十八宿动物对象\n参数 @index 为索引值(0-27)
-Animal.fromName(.(name) = 根据名称创建二十八宿动物对象\n参数 @name 为动物名称
-TwentyEightStar = 二十八宿
-TwentyEightStar.fromIndex(.(index) = 根据索引创建二十八宿对象\n参数 @index 为索引值(0-27)
-TwentyEightStar.fromName(.(name) = 根据名称创建二十八宿对象\n参数 @name 为宿名
-SevenStar = 七曜
-SevenStar.fromIndex(.(index) = 根据索引创建七曜对象\n参数 @index 为索引值(0-6)
-SevenStar.fromName(.(name) = 根据名称创建七曜对象\n参数 @name 为七曜名称
-Week = 星期
-Week.fromIndex(.(index) = 根据索引创建星期对象\n参数 @index 为索引值(0-6)
-Week.fromName(.(name) = 根据名称创建星期对象\n参数 @name 为星期名称
-Land = 九天
-Land.fromIndex(.(index) = 根据索引创建九天对象\n参数 @index 为索引值(0-8)
-Land.fromName(.(name) = 根据名称创建九天对象\n参数 @name 为九天名称
-Direction = 方位
-Direction.fromIndex(.(index) = 根据索引创建方位对象\n参数 @index 为索引值(0-8)
-Direction.fromName(.(name) = 根据名称创建方位对象\n参数 @name 为方位名称
-Zone = 四方
-Zone.fromIndex(.(index) = 根据索引创建四方对象\n参数 @index 为索引值(0-3)
-Zone.fromName(.(name) = 根据名称创建四方对象\n参数 @name 为四方名称
-Beast = 四象
-Beast.fromIndex(.(index) = 根据索引创建四象对象\n参数 @index 为索引值(0-3)
-Beast.fromName(.(name) = 根据名称创建四象对象\n参数 @name 为四象名称
-Luck = 吉凶
-Luck.fromIndex(.(index) = 根据索引创建吉凶对象\n参数 @index 为索引值(0-1)
-Luck.fromName(.(name) = 根据名称创建吉凶对象\n参数 @name 为吉凶名称
-Constellation = 星座
-Constellation.fromIndex(.(index) = 根据索引创建星座对象\n参数 @index 为索引值(0-11)
-Constellation.fromName(.(name) = 根据名称创建星座对象\n参数 @name 为星座名称
-Duty = 建除十二值
-Duty.fromIndex(.(index) = 根据索引创建建除值对象\n参数 @index 为索引值(0-11)
-Duty.fromName(.(name) = 根据名称创建建除值对象\n参数 @name 为建除值名称
-Element = 五行
-Element.fromIndex(.(index) = 根据索引创建五行对象\n参数 @index 为索引值(0-4)
-Element.fromName(.(name) = 根据名称创建五行对象\n参数 @name 为五行名称
-end intellisense*****/
-
 // God 类
 class God {
     ctor(indexOrName){
@@ -2032,42 +1959,6 @@ namespace Zodiac {
     indexOf = LoopTyme.indexOf;
     numeric = LoopTyme.numeric;
 }
-
-/*****intellisense(time.tyme)
-God = 神煞
-God.fromIndex(.(index) = 根据索引创建神煞对象\n参数 @index 为索引值
-God.fromName(.(name) = 根据名称创建神煞对象\n参数 @name 为神煞名称
-God.getDayGods(.(month,day) = 获取日神煞列表\n参数 @month 为月干支\n参数 @day 为日干支
-Phase = 月相
-Phase.fromIndex(.(lunarYear,lunarMonth,index) = 根据索引创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @index 为索引值(0-7)
-Phase.fromName(.(lunarYear,lunarMonth,name) = 根据名称创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @name 为月相名称
-PhaseDay = 月相日
-Sixty = 六十甲子元
-Sixty.fromIndex(.(index) = 根据索引创建元对象\n参数 @index 为索引值(0-2)
-Sixty.fromName(.(name) = 根据名称创建元对象\n参数 @name 为元名称
-Sound = 纳音
-Sound.fromIndex(.(index) = 根据索引创建纳音对象\n参数 @index 为索引值(0-29)
-Sound.fromName(.(name) = 根据名称创建纳音对象\n参数 @name 为纳音名称
-Taboo = 宜忌
-Taboo.fromIndex(.(index) = 根据索引创建宜忌对象\n参数 @index 为索引值
-Taboo.fromName(.(name) = 根据名称创建宜忌对象\n参数 @name 为宜忌名称
-Taboo.getDayRecommends(.(month,day) = 获取日宜列表\n参数 @month 为月干支\n参数 @day 为日干支
-Taboo.getDayAvoids(.(month,day) = 获取日忌列表\n参数 @month 为月干支\n参数 @day 为日干支
-Taboo.getHourRecommends(.(day,hour) = 获取时宜列表\n参数 @day 为日干支\n参数 @hour 为时干支
-Taboo.getHourAvoids(.(day,hour) = 获取时忌列表\n参数 @day 为日干支\n参数 @hour 为时干支
-Ten = 旬
-Ten.fromIndex(.(index) = 根据索引创建旬对象\n参数 @index 为索引值(0-5)
-Ten.fromName(.(name) = 根据名称创建旬对象\n参数 @name 为旬名称
-Terrain = 十二长生
-Terrain.fromIndex(.(index) = 根据索引创建长生对象\n参数 @index 为索引值(0-11)
-Terrain.fromName(.(name) = 根据名称创建长生对象\n参数 @name 为长生名称
-Twenty = 二十运
-Twenty.fromIndex(.(index) = 根据索引创建运对象\n参数 @index 为索引值(0-8)
-Twenty.fromName(.(name) = 根据名称创建运对象\n参数 @name 为运名称
-Zodiac = 生肖
-Zodiac.fromIndex(.(index) = 根据索引创建生肖对象\n参数 @index 为索引值(0-11)
-Zodiac.fromName(.(name) = 根据名称创建生肖对象\n参数 @name 为生肖名称
-end intellisense*****/
 
 // EarthBranch 类
 class EarthBranch {
@@ -2511,34 +2402,6 @@ namespace MinorRen {
     numeric = LoopTyme.numeric;
 }
 var MinorRen = MinorRen;
-
-/*****intellisense(time.tyme)
-EarthBranch = 地支
-EarthBranch.fromIndex(.(index) = 根据索引创建地支对象\n参数 @index 为索引值(0-11)
-EarthBranch.fromName(.(name) = 根据名称创建地支对象\n参数 @name 为地支名称
-HeavenStem = 天干
-HeavenStem.fromIndex(.(index) = 根据索引创建天干对象\n参数 @index 为索引值(0-9)
-HeavenStem.fromName(.(name) = 根据名称创建天干对象\n参数 @name 为天干名称
-HideHeavenStem = 藏干
-HideHeavenStemDay = 藏干日
-PengZuHeavenStem = 彭祖百忌天干
-PengZuHeavenStem.fromIndex(.(index) = 根据索引创建彭祖天干对象\n参数 @index 为索引值(0-9)
-PengZuHeavenStem.fromName(.(name) = 根据名称创建彭祖天干对象\n参数 @name 为天干名称
-PengZuEarthBranch = 彭祖百忌地支
-PengZuEarthBranch.fromIndex(.(index) = 根据索引创建彭祖地支对象\n参数 @index 为索引值(0-11)
-PengZuEarthBranch.fromName(.(name) = 根据名称创建彭祖地支对象\n参数 @name 为地支名称
-PengZu = 彭祖百忌
-PengZu.fromSixtyCycle(.(sixtyCycle) = 根据六十甲子创建彭祖百忌对象\n参数 @sixtyCycle 为六十甲子对象
-TenStar = 十神
-TenStar.fromIndex(.(index) = 根据索引创建十神对象\n参数 @index 为索引值(0-9)
-TenStar.fromName(.(name) = 根据名称创建十神对象\n参数 @name 为十神名称
-SixStar = 六曜
-SixStar.fromIndex(.(index) = 根据索引创建六曜对象\n参数 @index 为索引值(0-5)
-SixStar.fromName(.(name) = 根据名称创建六曜对象\n参数 @name 为六曜名称
-MinorRen = 小六壬
-MinorRen.fromIndex(.(index) = 根据索引创建小六壬对象\n参数 @index 为索引值(0-5)
-MinorRen.fromName(.(name) = 根据名称创建小六壬对象\n参数 @name 为小六壬名称
-end intellisense*****/
 
 // SixtyCycle 类
 class SixtyCycle {
@@ -2988,39 +2851,6 @@ namespace PhenologyDay {
     numeric = AbstractCultureDay.numeric;
 }
 var PhenologyDay = PhenologyDay;
-
-/*****intellisense(time.tyme)
-SixtyCycle = 六十甲子
-SixtyCycle.fromIndex(.(index) = 根据索引创建六十甲子对象\n参数 @index 为索引值(0-59)
-SixtyCycle.fromName(.(name) = 根据名称创建六十甲子对象\n参数 @name 为干支名称
-Dog = 三伏
-Dog.fromIndex(.(index) = 根据索引创建三伏对象\n参数 @index 为索引值(0-2)
-Dog.fromName(.(name) = 根据名称创建三伏对象\n参数 @name 为三伏名称
-DogDay = 三伏日
-PlumRain = 梅雨
-PlumRain.fromIndex(.(index) = 根据索引创建梅雨对象\n参数 @index 为索引值(0-1)
-PlumRain.fromName(.(name) = 根据名称创建梅雨对象\n参数 @name 为梅雨名称
-PlumRainDay = 梅雨日
-FetusHeavenStem = 胎神天干
-FetusEarthBranch = 胎神地支
-FetusDay = 胎神日
-FetusDay.fromLunarDay(.(lunarDay) = 根据农历日创建胎神日对象\n参数 @lunarDay 为农历日对象
-FetusDay.fromSixtyCycleDay(.(sixtyCycleDay) = 根据干支日创建胎神日对象\n参数 @sixtyCycleDay 为干支日对象
-Nine = 数九
-Nine.fromIndex(.(index) = 根据索引创建数九对象\n参数 @index 为索引值(0-8)
-Nine.fromName(.(name) = 根据名称创建数九对象\n参数 @name 为数九名称
-NineDay = 数九日
-Phenology = 物候
-Phenology.fromIndex(.(year,index) = 根据索引创建物候对象\n参数 @year 为年份\n参数 @index 为索引值(0-71)
-Phenology.fromName(.(year,name) = 根据名称创建物候对象\n参数 @year 为年份\n参数 @name 为物候名称
-ThreePhenology = 三候
-ThreePhenology.fromIndex(.(index) = 根据索引创建三候对象\n参数 @index 为索引值(0-2)
-ThreePhenology.fromName(.(name) = 根据名称创建三候对象\n参数 @name 为三候名称
-Dipper = 北斗九星
-Dipper.fromIndex(.(index) = 根据索引创建北斗九星对象\n参数 @index 为索引值(0-8)
-Dipper.fromName(.(name) = 根据名称创建北斗九星对象\n参数 @name 为北斗九星名称
-PhenologyDay = 物候日
-end intellisense*****/
 
 // NineStar 类
 class NineStar {
@@ -3521,28 +3351,6 @@ namespace LunarMonth {
     numeric = AbstractTyme.numeric;
 }
 
-
-/*****intellisense(time.tyme)
-NineStar = 九星
-NineStar.fromIndex(.(index) = 根据索引创建九星对象\n参数 @index 为索引值(0-8)
-NineStar.fromName(.(name) = 根据名称创建九星对象\n参数 @name 为九星名称
-TwelveStar = 黄道黑道十二神
-TwelveStar.fromIndex(.(index) = 根据索引创建十二神对象\n参数 @index 为索引值(0-11)
-TwelveStar.fromName(.(name) = 根据名称创建十二神对象\n参数 @name 为十二神名称
-Ecliptic = 黄道黑道
-Ecliptic.fromIndex(.(index) = 根据索引创建黄道黑道对象\n参数 @index 为索引值(0-1)
-Ecliptic.fromName(.(name) = 根据名称创建黄道黑道对象\n参数 @name 为黄道黑道名称
-LunarYear = 农历年
-LunarYear.fromYear(.(year) = 根据年份创建农历年对象\n参数 @year 为年份(-1至9999)
-LunarSeason = 农历季节
-LunarSeason.fromIndex(.(index) = 根据索引创建农历季节对象\n参数 @index 为索引值(0-11)
-LunarSeason.fromName(.(name) = 根据名称创建农历季节对象\n参数 @name 为季节名称
-FetusMonth = 胎神月
-FetusMonth.fromLunarMonth(.(lunarMonth) = 根据农历月创建胎神月对象\n参数 @lunarMonth 为农历月对象
-LunarMonth = 农历月
-LunarMonth.fromYm(.(year,month) = 根据年月创建农历月对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)
-end intellisense*****/
-
 // LunarWeek 类
 class LunarWeek {
     ctor(year, month, index, start){
@@ -4014,17 +3822,6 @@ namespace SixtyCycleMonth {
     indexOf = AbstractTyme.indexOf;
     numeric = AbstractTyme.numeric;
 }
-
-/*****intellisense(time.tyme)
-LunarWeek = 农历周
-LunarWeek.fromYm(.(year,month,index,start) = 根据年月周索引创建农历周对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @index 为周索引(0-5)\n参数 @start 为起始星期
-LunarDay = 农历日
-LunarDay.fromYmd(.(year,month,day) = 根据年月日创建农历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(1-30)
-SixtyCycleYear = 干支年
-SixtyCycleYear.fromYear(.(year) = 根据年份创建干支年对象\n参数 @year 为年份(-1至9999)
-SixtyCycleMonth = 干支月
-SixtyCycleMonth.fromIndex(.(year,index) = 根据年份和索引创建干支月对象\n参数 @year 为年份\n参数 @index 为月索引(0-11)
-end intellisense*****/
 
 // SixtyCycleDay 类
 class SixtyCycleDay {
@@ -4533,16 +4330,6 @@ namespace LunarHour {
     numeric = AbstractTyme.numeric;
 }
 
-/*****intellisense(time.tyme)
-SixtyCycleDay = 干支日
-SixtyCycleDay.fromSolarDay(.(solarDay) = 根据公历日创建干支日对象\n参数 @solarDay 为公历日对象
-SixtyCycleHour = 干支时
-SixtyCycleHour.fromSolarTime(.(solarTime) = 根据公历时间创建干支时对象\n参数 @solarTime 为公历时间对象
-ThreePillars = 三柱
-LunarHour = 农历时
-LunarHour.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建农历时对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)
-end intellisense*****/
-
 // JulianDay 类
 class JulianDay {
     ctor(day){
@@ -5009,19 +4796,6 @@ var ShouXingUtil = ShouXingUtil;
 LunarMonth.ShouXingUtil = ShouXingUtil;
 SolarTerm.ShouXingUtil = ShouXingUtil;
 
-/*****intellisense(time.tyme)
-JulianDay = 儒略日
-JulianDay.fromJulianDay(.(day) = 根据儒略日数创建儒略日对象\n参数 @day 为儒略日数
-JulianDay.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建儒略日对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n参数 @hour 为小时\n参数 @minute 为分钟\n参数 @second 为秒
-SixtyCycleDay = 干支日
-SixtyCycleDay.fromSolarDay(.(solarDay) = 根据公历日创建干支日对象\n参数 @solarDay 为公历日对象
-SixtyCycleHour = 干支时
-SixtyCycleHour.fromSolarTime(.(solarTime) = 根据公历时间创建干支时对象\n参数 @solarTime 为公历时间对象
-ThreePillars = 三柱(年月日)
-ShouXingUtil = 寿星天文历算工具类
-end intellisense*****/
-
-
 // LegalHoliday 类
 class LegalHoliday {
     ctor(year, month, day, data){
@@ -5321,18 +5095,6 @@ namespace LunarFestival {
     indexOf = AbstractTyme.indexOf;
     numeric = AbstractTyme.numeric;
 }
-
-
-/*****intellisense(time.tyme)
-LegalHoliday = 法定节假日
-LegalHoliday.fromYmd(.(year,month,day) = 根据年月日获取法定节假日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节假日对象或null
-SolarFestival = 公历节日
-SolarFestival.fromIndex(.(year,index) = 根据年份和索引创建公历节日对象\n参数 @year 为年份\n参数 @index 为节日索引
-SolarFestival.fromYmd(.(year,month,day) = 根据年月日获取公历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
-LunarFestival = 农历节日
-LunarFestival.fromIndex(.(year,index) = 根据年份和索引创建农历节日对象\n参数 @year 为年份\n参数 @index 为节日索引
-LunarFestival.fromYmd(.(year,month,day) = 根据年月日获取农历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
-end intellisense*****/
 
 // EightChar 类
 class EightChar {
@@ -5911,25 +5673,6 @@ var LunarSect2EightCharProvider = LunarSect2EightCharProvider;
 
 // 设置默认的八字提供者
 LunarHour.provider = DefaultEightCharProvider();
-
-/*****intellisense(time.tyme)
-EightChar = 八字
-ChildLimitInfo = 童限信息
-AbstractChildLimitProvider = 抽象童限提供者
-DefaultChildLimitProvider = 默认童限提供者
-China95ChildLimitProvider = 95派童限提供者
-LunarSect1ChildLimitProvider = 农历派1童限提供者
-LunarSect2ChildLimitProvider = 农历派2童限提供者
-ChildLimit = 童限
-ChildLimit.fromSolarTime(.(birthTime,gender) = 根据出生时间和性别创建童限对象\n参数 @birthTime 为出生时间对象\n参数 @gender 为性别(Gender.MAN或Gender.WOMAN)
-ChildLimit.provider = 童限提供者，默认为DefaultChildLimitProvider
-DecadeFortune = 大运
-DecadeFortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建大运对象\n参数 @childLimit 为童限对象\n参数 @index 为大运索引
-Fortune = 流年
-Fortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建流年对象\n参数 @childLimit 为童限对象\n参数 @index 为流年索引
-DefaultEightCharProvider = 默认八字提供者
-LunarSect2EightCharProvider = 农历派2八字提供者
-end intellisense*****/
 
 // KitchenGodSteed 类
 class KitchenGodSteed {
@@ -6520,25 +6263,6 @@ namespace RabByungDay {
     numeric = AbstractTyme.numeric;
 }
 
-
-/*****intellisense(time.tyme)
-KitchenGodSteed = 灶马头
-KitchenGodSteed.fromLunarYear(.(lunarYear) = 根据农历年创建灶马头对象\n参数 @lunarYear 为农历年份
-RabByungElement = 藏历五行
-RabByungElement.fromIndex(.(index) = 根据索引创建藏历五行对象\n参数 @index 为五行索引(0-4)
-RabByungElement.fromName(.(name) = 根据名称创建藏历五行对象\n参数 @name 为五行名称
-RabByungYear = 藏历年
-RabByungYear.fromYear(.(year) = 根据年份创建藏历年对象\n参数 @year 为年份
-RabByungYear.fromElementZodiac(.(rabByungIndex,element,zodiac) = 根据饶迥索引、五行、生肖创建藏历年对象\n参数 @rabByungIndex 为饶迥索引(0-150)\n参数 @element 为藏历五行对象\n参数 @zodiac 为生肖对象
-RabByungMonth = 藏历月
-RabByungMonth.fromYm(.(year,month) = 根据年月创建藏历月对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)
-RabByungMonth.fromElementZodiac(.(rabByungIndex,element,zodiac,month) = 根据饶迥索引、五行、生肖、月份创建藏历月对象\n参数 @rabByungIndex 为饶迥索引\n参数 @element 为藏历五行对象\n参数 @zodiac 为生肖对象\n参数 @month 为月份
-RabByungDay = 藏历日
-RabByungDay.fromYmd(.(year,month,day) = 根据年月日创建藏历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(负数表示闰日)
-RabByungDay.fromElementZodiac(.(rabByungIndex,element,zodiac,month,day) = 根据饶迥索引、五行、生肖、月份、日期创建藏历日对象
-RabByungDay.fromSolarDay(.(solarDay) = 根据公历日创建藏历日对象\n参数 @solarDay 为公历日对象
-end intellisense*****/
-
 // 枚举类型定义
 namespace YinYang {
     YIN = 0;
@@ -6571,6 +6295,285 @@ namespace HideHeavenStemType {
     MAIN = 2;
 }
 var HideHeavenStemType = HideHeavenStemType;
+
+
+/*****intellisense()
+time.tyme = 万年历与农历支持库
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+YinYang = 阴阳枚举\n@.YIN 阴\n@.YANG 阳
+Side = 方位枚举\n@.IN 内\n@.OUT 外
+Gender = 性别枚举\n@.WOMAN 女\n@.MAN 男
+FestivalType = 节日类型枚举\n@.DAY 日\n@.TERM 节气\n@.EVE 除夕
+HideHeavenStemType = 藏干类型枚举\n@.RESIDUAL 余气\n@.MIDDLE 中气\n@.MAIN 本气
+Animal = 二十八宿动物
+Animal.fromIndex(.(index) = 根据索引创建二十八宿动物对象\n参数 @index 为索引值(0-27)
+Animal.fromName(.(name) = 根据名称创建二十八宿动物对象\n参数 @name 为动物名称
+TwentyEightStar = 二十八宿
+TwentyEightStar.fromIndex(.(index) = 根据索引创建二十八宿对象\n参数 @index 为索引值(0-27)
+TwentyEightStar.fromName(.(name) = 根据名称创建二十八宿对象\n参数 @name 为宿名
+SevenStar = 七曜
+SevenStar.fromIndex(.(index) = 根据索引创建七曜对象\n参数 @index 为索引值(0-6)
+SevenStar.fromName(.(name) = 根据名称创建七曜对象\n参数 @name 为七曜名称
+Week = 星期
+Week.fromIndex(.(index) = 根据索引创建星期对象\n参数 @index 为索引值(0-6)
+Week.fromName(.(name) = 根据名称创建星期对象\n参数 @name 为星期名称
+Land = 九天
+Land.fromIndex(.(index) = 根据索引创建九天对象\n参数 @index 为索引值(0-8)
+Land.fromName(.(name) = 根据名称创建九天对象\n参数 @name 为九天名称
+Direction = 方位
+Direction.fromIndex(.(index) = 根据索引创建方位对象\n参数 @index 为索引值(0-8)
+Direction.fromName(.(name) = 根据名称创建方位对象\n参数 @name 为方位名称
+Zone = 四方
+Zone.fromIndex(.(index) = 根据索引创建四方对象\n参数 @index 为索引值(0-3)
+Zone.fromName(.(name) = 根据名称创建四方对象\n参数 @name 为四方名称
+Beast = 四象
+Beast.fromIndex(.(index) = 根据索引创建四象对象\n参数 @index 为索引值(0-3)
+Beast.fromName(.(name) = 根据名称创建四象对象\n参数 @name 为四象名称
+Luck = 吉凶
+Luck.fromIndex(.(index) = 根据索引创建吉凶对象\n参数 @index 为索引值(0-1)
+Luck.fromName(.(name) = 根据名称创建吉凶对象\n参数 @name 为吉凶名称
+Constellation = 星座
+Constellation.fromIndex(.(index) = 根据索引创建星座对象\n参数 @index 为索引值(0-11)
+Constellation.fromName(.(name) = 根据名称创建星座对象\n参数 @name 为星座名称
+Duty = 建除十二值
+Duty.fromIndex(.(index) = 根据索引创建建除值对象\n参数 @index 为索引值(0-11)
+Duty.fromName(.(name) = 根据名称创建建除值对象\n参数 @name 为建除值名称
+Element = 五行
+Element.fromIndex(.(index) = 根据索引创建五行对象\n参数 @index 为索引值(0-4)
+Element.fromName(.(name) = 根据名称创建五行对象\n参数 @name 为五行名称
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+SolarTerm = 节气
+SolarTerm.fromIndex(.(year,index) = 根据年份和索引创建节气对象\n参数 @year 为年份\n参数 @index 为节气索引(0-23)
+SolarTerm.fromName(.(year,name) = 根据年份和名称创建节气对象\n参数 @year 为年份\n参数 @name 为节气名称
+SolarTermDay = 节气日
+SolarYear = 公历年
+SolarYear.fromYear(.(year) = 根据年份创建公历年对象\n参数 @year 为年份(1-9999)
+SolarHalfYear = 公历半年
+SolarHalfYear.fromIndex(.(year,index) = 根据年份和索引创建公历半年对象\n参数 @year 为年份\n参数 @index 为半年索引(0-1)
+SolarSeason = 公历季度
+SolarSeason.fromIndex(.(year,index) = 根据年份和索引创建公历季度对象\n参数 @year 为年份\n参数 @index 为季度索引(0-3)
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+SolarMonth = 公历月
+SolarMonth.fromYm(.(year,month) = 根据年月创建公历月对象\n参数 @year 为年份\n参数 @month 为月份(1-12)
+SolarWeek = 公历周
+SolarWeek.fromYm(.(year,month,index,start) = 根据年月周索引创建公历周对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @index 为周索引(0-5)\n参数 @start 为起始星期
+SolarDay = 公历日
+SolarDay.fromYmd(.(year,month,day) = 根据年月日创建公历日对象\n参数 @year 为年份\n参数 @month 为月份(1-12)\n参数 @day 为日期(1-31)
+SolarTime = 公历时间
+SolarTime.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建公历时间对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+God = 神煞
+God.fromIndex(.(index) = 根据索引创建神煞对象\n参数 @index 为索引值
+God.fromName(.(name) = 根据名称创建神煞对象\n参数 @name 为神煞名称
+God.getDayGods(.(month,day) = 获取日神煞列表\n参数 @month 为月干支\n参数 @day 为日干支
+Phase = 月相
+Phase.fromIndex(.(lunarYear,lunarMonth,index) = 根据索引创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @index 为索引值(0-7)
+Phase.fromName(.(lunarYear,lunarMonth,name) = 根据名称创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @name 为月相名称
+PhaseDay = 月相日
+Sixty = 六十甲子元
+Sixty.fromIndex(.(index) = 根据索引创建元对象\n参数 @index 为索引值(0-2)
+Sixty.fromName(.(name) = 根据名称创建元对象\n参数 @name 为元名称
+Sound = 纳音
+Sound.fromIndex(.(index) = 根据索引创建纳音对象\n参数 @index 为索引值(0-29)
+Sound.fromName(.(name) = 根据名称创建纳音对象\n参数 @name 为纳音名称
+Taboo = 宜忌
+Taboo.fromIndex(.(index) = 根据索引创建宜忌对象\n参数 @index 为索引值
+Taboo.fromName(.(name) = 根据名称创建宜忌对象\n参数 @name 为宜忌名称
+Taboo.getDayRecommends(.(month,day) = 获取日宜列表\n参数 @month 为月干支\n参数 @day 为日干支
+Taboo.getDayAvoids(.(month,day) = 获取日忌列表\n参数 @month 为月干支\n参数 @day 为日干支
+Taboo.getHourRecommends(.(day,hour) = 获取时宜列表\n参数 @day 为日干支\n参数 @hour 为时干支
+Taboo.getHourAvoids(.(day,hour) = 获取时忌列表\n参数 @day 为日干支\n参数 @hour 为时干支
+Ten = 旬
+Ten.fromIndex(.(index) = 根据索引创建旬对象\n参数 @index 为索引值(0-5)
+Ten.fromName(.(name) = 根据名称创建旬对象\n参数 @name 为旬名称
+Terrain = 十二长生
+Terrain.fromIndex(.(index) = 根据索引创建长生对象\n参数 @index 为索引值(0-11)
+Terrain.fromName(.(name) = 根据名称创建长生对象\n参数 @name 为长生名称
+Twenty = 二十运
+Twenty.fromIndex(.(index) = 根据索引创建运对象\n参数 @index 为索引值(0-8)
+Twenty.fromName(.(name) = 根据名称创建运对象\n参数 @name 为运名称
+Zodiac = 生肖
+Zodiac.fromIndex(.(index) = 根据索引创建生肖对象\n参数 @index 为索引值(0-11)
+Zodiac.fromName(.(name) = 根据名称创建生肖对象\n参数 @name 为生肖名称
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+EarthBranch = 地支
+EarthBranch.fromIndex(.(index) = 根据索引创建地支对象\n参数 @index 为索引值(0-11)
+EarthBranch.fromName(.(name) = 根据名称创建地支对象\n参数 @name 为地支名称
+HeavenStem = 天干
+HeavenStem.fromIndex(.(index) = 根据索引创建天干对象\n参数 @index 为索引值(0-9)
+HeavenStem.fromName(.(name) = 根据名称创建天干对象\n参数 @name 为天干名称
+HideHeavenStem = 藏干
+HideHeavenStemDay = 藏干日
+PengZuHeavenStem = 彭祖百忌天干
+PengZuHeavenStem.fromIndex(.(index) = 根据索引创建彭祖天干对象\n参数 @index 为索引值(0-9)
+PengZuHeavenStem.fromName(.(name) = 根据名称创建彭祖天干对象\n参数 @name 为天干名称
+PengZuEarthBranch = 彭祖百忌地支
+PengZuEarthBranch.fromIndex(.(index) = 根据索引创建彭祖地支对象\n参数 @index 为索引值(0-11)
+PengZuEarthBranch.fromName(.(name) = 根据名称创建彭祖地支对象\n参数 @name 为地支名称
+PengZu = 彭祖百忌
+PengZu.fromSixtyCycle(.(sixtyCycle) = 根据六十甲子创建彭祖百忌对象\n参数 @sixtyCycle 为六十甲子对象
+TenStar = 十神
+TenStar.fromIndex(.(index) = 根据索引创建十神对象\n参数 @index 为索引值(0-9)
+TenStar.fromName(.(name) = 根据名称创建十神对象\n参数 @name 为十神名称
+SixStar = 六曜
+SixStar.fromIndex(.(index) = 根据索引创建六曜对象\n参数 @index 为索引值(0-5)
+SixStar.fromName(.(name) = 根据名称创建六曜对象\n参数 @name 为六曜名称
+MinorRen = 小六壬
+MinorRen.fromIndex(.(index) = 根据索引创建小六壬对象\n参数 @index 为索引值(0-5)
+MinorRen.fromName(.(name) = 根据名称创建小六壬对象\n参数 @name 为小六壬名称
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+SixtyCycle = 六十甲子
+SixtyCycle.fromIndex(.(index) = 根据索引创建六十甲子对象\n参数 @index 为索引值(0-59)
+SixtyCycle.fromName(.(name) = 根据名称创建六十甲子对象\n参数 @name 为干支名称
+Dog = 三伏
+Dog.fromIndex(.(index) = 根据索引创建三伏对象\n参数 @index 为索引值(0-2)
+Dog.fromName(.(name) = 根据名称创建三伏对象\n参数 @name 为三伏名称
+DogDay = 三伏日
+PlumRain = 梅雨
+PlumRain.fromIndex(.(index) = 根据索引创建梅雨对象\n参数 @index 为索引值(0-1)
+PlumRain.fromName(.(name) = 根据名称创建梅雨对象\n参数 @name 为梅雨名称
+PlumRainDay = 梅雨日
+FetusHeavenStem = 胎神天干
+FetusEarthBranch = 胎神地支
+FetusDay = 胎神日
+FetusDay.fromLunarDay(.(lunarDay) = 根据农历日创建胎神日对象\n参数 @lunarDay 为农历日对象
+FetusDay.fromSixtyCycleDay(.(sixtyCycleDay) = 根据干支日创建胎神日对象\n参数 @sixtyCycleDay 为干支日对象
+Nine = 数九
+Nine.fromIndex(.(index) = 根据索引创建数九对象\n参数 @index 为索引值(0-8)
+Nine.fromName(.(name) = 根据名称创建数九对象\n参数 @name 为数九名称
+NineDay = 数九日
+Phenology = 物候
+Phenology.fromIndex(.(year,index) = 根据索引创建物候对象\n参数 @year 为年份\n参数 @index 为索引值(0-71)
+Phenology.fromName(.(year,name) = 根据名称创建物候对象\n参数 @year 为年份\n参数 @name 为物候名称
+ThreePhenology = 三候
+ThreePhenology.fromIndex(.(index) = 根据索引创建三候对象\n参数 @index 为索引值(0-2)
+ThreePhenology.fromName(.(name) = 根据名称创建三候对象\n参数 @name 为三候名称
+Dipper = 北斗九星
+Dipper.fromIndex(.(index) = 根据索引创建北斗九星对象\n参数 @index 为索引值(0-8)
+Dipper.fromName(.(name) = 根据名称创建北斗九星对象\n参数 @name 为北斗九星名称
+PhenologyDay = 物候日
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+NineStar = 九星
+NineStar.fromIndex(.(index) = 根据索引创建九星对象\n参数 @index 为索引值(0-8)
+NineStar.fromName(.(name) = 根据名称创建九星对象\n参数 @name 为九星名称
+TwelveStar = 黄道黑道十二神
+TwelveStar.fromIndex(.(index) = 根据索引创建十二神对象\n参数 @index 为索引值(0-11)
+TwelveStar.fromName(.(name) = 根据名称创建十二神对象\n参数 @name 为十二神名称
+Ecliptic = 黄道黑道
+Ecliptic.fromIndex(.(index) = 根据索引创建黄道黑道对象\n参数 @index 为索引值(0-1)
+Ecliptic.fromName(.(name) = 根据名称创建黄道黑道对象\n参数 @name 为黄道黑道名称
+LunarYear = 农历年
+LunarYear.fromYear(.(year) = 根据年份创建农历年对象\n参数 @year 为年份(-1至9999)
+LunarSeason = 农历季节
+LunarSeason.fromIndex(.(index) = 根据索引创建农历季节对象\n参数 @index 为索引值(0-11)
+LunarSeason.fromName(.(name) = 根据名称创建农历季节对象\n参数 @name 为季节名称
+FetusMonth = 胎神月
+FetusMonth.fromLunarMonth(.(lunarMonth) = 根据农历月创建胎神月对象\n参数 @lunarMonth 为农历月对象
+LunarMonth = 农历月
+LunarMonth.fromYm(.(year,month) = 根据年月创建农历月对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+LunarWeek = 农历周
+LunarWeek.fromYm(.(year,month,index,start) = 根据年月周索引创建农历周对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @index 为周索引(0-5)\n参数 @start 为起始星期
+LunarDay = 农历日
+LunarDay.fromYmd(.(year,month,day) = 根据年月日创建农历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(1-30)
+SixtyCycleYear = 干支年
+SixtyCycleYear.fromYear(.(year) = 根据年份创建干支年对象\n参数 @year 为年份(-1至9999)
+SixtyCycleMonth = 干支月
+SixtyCycleMonth.fromIndex(.(year,index) = 根据年份和索引创建干支月对象\n参数 @year 为年份\n参数 @index 为月索引(0-11)
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+SixtyCycleDay = 干支日
+SixtyCycleDay.fromSolarDay(.(solarDay) = 根据公历日创建干支日对象\n参数 @solarDay 为公历日对象
+SixtyCycleHour = 干支时
+SixtyCycleHour.fromSolarTime(.(solarTime) = 根据公历时间创建干支时对象\n参数 @solarTime 为公历时间对象
+ThreePillars = 三柱
+LunarHour = 农历时
+LunarHour.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建农历时对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+JulianDay = 儒略日
+JulianDay.fromJulianDay(.(day) = 根据儒略日数创建儒略日对象\n参数 @day 为儒略日数
+JulianDay.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建儒略日对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n参数 @hour 为小时\n参数 @minute 为分钟\n参数 @second 为秒
+SixtyCycleDay = 干支日
+SixtyCycleDay.fromSolarDay(.(solarDay) = 根据公历日创建干支日对象\n参数 @solarDay 为公历日对象
+SixtyCycleHour = 干支时
+SixtyCycleHour.fromSolarTime(.(solarTime) = 根据公历时间创建干支时对象\n参数 @solarTime 为公历时间对象
+ThreePillars = 三柱(年月日)
+ShouXingUtil = 寿星天文历算工具类
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+LegalHoliday = 法定节假日
+LegalHoliday.fromYmd(.(year,month,day) = 根据年月日获取法定节假日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节假日对象或null
+SolarFestival = 公历节日
+SolarFestival.fromIndex(.(year,index) = 根据年份和索引创建公历节日对象\n参数 @year 为年份\n参数 @index 为节日索引
+SolarFestival.fromYmd(.(year,month,day) = 根据年月日获取公历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
+LunarFestival = 农历节日
+LunarFestival.fromIndex(.(year,index) = 根据年份和索引创建农历节日对象\n参数 @year 为年份\n参数 @index 为节日索引
+LunarFestival.fromYmd(.(year,month,day) = 根据年月日获取农历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
+end intellisense*****/
+
+/*****intellisense(time.tyme)
+EightChar = 八字
+ChildLimitInfo = 童限信息
+AbstractChildLimitProvider = 抽象童限提供者
+DefaultChildLimitProvider = 默认童限提供者
+China95ChildLimitProvider = 95派童限提供者
+LunarSect1ChildLimitProvider = 农历派1童限提供者
+LunarSect2ChildLimitProvider = 农历派2童限提供者
+ChildLimit = 童限
+ChildLimit.fromSolarTime(.(birthTime,gender) = 根据出生时间和性别创建童限对象\n参数 @birthTime 为出生时间对象\n参数 @gender 为性别(Gender.MAN或Gender.WOMAN)
+ChildLimit.provider = 童限提供者，默认为DefaultChildLimitProvider
+DecadeFortune = 大运
+DecadeFortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建大运对象\n参数 @childLimit 为童限对象\n参数 @index 为大运索引
+Fortune = 流年
+Fortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建流年对象\n参数 @childLimit 为童限对象\n参数 @index 为流年索引
+DefaultEightCharProvider = 默认八字提供者
+LunarSect2EightCharProvider = 农历派2八字提供者
+end intellisense*****/
+
+
+/*****intellisense(time.tyme)
+KitchenGodSteed = 灶马头
+KitchenGodSteed.fromLunarYear(.(lunarYear) = 根据农历年创建灶马头对象\n参数 @lunarYear 为农历年份
+RabByungElement = 藏历五行
+RabByungElement.fromIndex(.(index) = 根据索引创建藏历五行对象\n参数 @index 为五行索引(0-4)
+RabByungElement.fromName(.(name) = 根据名称创建藏历五行对象\n参数 @name 为五行名称
+RabByungYear = 藏历年
+RabByungYear.fromYear(.(year) = 根据年份创建藏历年对象\n参数 @year 为年份
+RabByungYear.fromElementZodiac(.(rabByungIndex,element,zodiac) = 根据饶迥索引、五行、生肖创建藏历年对象\n参数 @rabByungIndex 为饶迥索引(0-150)\n参数 @element 为藏历五行对象\n参数 @zodiac 为生肖对象
+RabByungMonth = 藏历月
+RabByungMonth.fromYm(.(year,month) = 根据年月创建藏历月对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)
+RabByungMonth.fromElementZodiac(.(rabByungIndex,element,zodiac,month) = 根据饶迥索引、五行、生肖、月份创建藏历月对象\n参数 @rabByungIndex 为饶迥索引\n参数 @element 为藏历五行对象\n参数 @zodiac 为生肖对象\n参数 @month 为月份
+RabByungDay = 藏历日
+RabByungDay.fromYmd(.(year,month,day) = 根据年月日创建藏历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(负数表示闰日)
+RabByungDay.fromElementZodiac(.(rabByungIndex,element,zodiac,month,day) = 根据饶迥索引、五行、生肖、月份、日期创建藏历日对象
+RabByungDay.fromSolarDay(.(solarDay) = 根据公历日创建藏历日对象\n参数 @solarDay 为公历日对象
+end intellisense*****/
+
 
 /*****intellisense()
 time.tyme = 万年历与农历支持库，提供公历、农历、干支、节气、星座、生肖等功能
