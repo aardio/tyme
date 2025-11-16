@@ -955,17 +955,21 @@ SolarDay.fromYmd(.(year,month,day) = 根据年月日创建公历日对象\n参�
 SolarTime = 公历时间
 SolarTime.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建公历时间对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)\n返回公历时间对象
 SolarTime.fromYmdHms(.(timeObject) = 使用参数 @1 指定的 time 对象创建公历时间对象。\n也可以指定任何包含了 year, month, day, hour, minute, second 字段的表。
-next(.(n) = 获取偏移n天的公历日对象
+ 
+SolarDay.fromYmd() = !tymeSolarDay.
+SolarDay.fromYm() = !tymeSolarDay.
+SolarDay.fromYear() = !tymeSolarDay.
+SolarDay.fromYmd() = !tymeSolarDay.
 end intellisense**/
 
-/**intellisense(time.tyme.SolarDay.SolarDay)
+/**intellisense(!tymeSolarDay)
 fromYmd(.(year,month,day) = 根据年月日创建公历日对象
 fromYmd(.(timeObject) = 使用参数 @1 指定的 time 对象创建公历日对象。\n也可以指定任何包含了 year, month, day 字段的表。
 next(.(n) = 获取偏移n天的公历日对象
 getSolarMonth() = 获取公历月对象
-getYear() = 获取年份
-getMonth() = 获取月份
-getDay() = 获取日期
+getYear() = 获取年份，返回值为数值
+getMonth() = 获取月份，返回值为数值
+getDay() = 获取日期，返回值为数值
 getWeek() = 获取星期对象
 getConstellation() = 获取星座对象
 getName() = 获取日期名称
@@ -989,6 +993,6 @@ getLegalHoliday() = 获取法定节假日对象(无节假日返回null)
 getFestival() = 获取公历节日对象(无节日返回null)
 getPhaseDay() = 获取月相日对象
 getPhase() = 获取月相对象
-getHideHeavenStemDay() = 获取藏干日对象
+getHideHeavenStemDay() = 获取藏干日对象\n!tymeHideHeavenStemDay.
 getNineDay() = 获取数九日对象(非数九返回null)
 end intellisense**/

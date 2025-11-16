@@ -76,11 +76,11 @@ God = 神煞
 God.fromIndex(.(index) = 根据索引创建神煞对象\n参数 @index 为索引值(1-141)\n返回神煞对象
 God.fromName(.(name) = 根据名称创建神煞对象\n参数 @name 为神煞名称\n返回神煞对象
 God.getDayGods(.(month,day) = 获取日神煞列表\n参数 @month 为月干支对象\n参数 @day 为日干支对象\n返回神煞对象数组
+God.fromIndex() = !tymeGod.
+God.fromName() = !tymeGod.
 end intellisense**/
 
-/**intellisense(time.tyme.God)
-fromIndex(.(index) = 根据索引创建神煞对象
-fromName(.(name) = 根据名称创建神煞对象
+/**intellisense(!tymeGod)
 next(.(n) = 获取偏移n个位置的神煞对象
 getLuck() = 获取吉凶对象
 getName() = 获取名称

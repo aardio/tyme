@@ -202,6 +202,11 @@ end intellisense**/
 /**intellisense(time.tyme.Element)
 fromIndex(.(index) = 根据索引创建五行对象\n参数 @index 为索引值(1-5)
 fromName(.(name) = 根据名称创建五行对象\n参数 @name 为五行名称
+fromIndex() = !tymeElement.
+fromName() = !tymeElement
+end intellisense**/
+
+/**intellisense(!tymeElement)
 next(.(n) = 获取偏移n个位置的五行对象\n参数 @n 为偏移量
 getReinforce() = 获取相生的五行对象
 getRestrain() = 获取相克的五行对象

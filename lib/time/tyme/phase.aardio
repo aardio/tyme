@@ -106,11 +106,11 @@ Phase = 月相
 Phase.fromIndex(.(lunarYear,lunarMonth,index) = 根据农历年月和索引创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @index 为月相索引(1-8)\n返回月相对象
 Phase.fromName(.(lunarYear,lunarMonth,name) = 根据农历年月和名称创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @name 为月相名称\n返回月相对象
 PhaseDay = 月相日
+Phase.fromIndex() = !tymePhase.
+Phase.fromName() = !tymePhase.
 end intellisense**/
 
-/**intellisense(time.tyme.Phase.Phase)
-fromIndex(.(lunarYear,lunarMonth,index) = 根据农历年月和索引创建月相对象
-fromName(.(lunarYear,lunarMonth,name) = 根据农历年月和名称创建月相对象
+/**intellisense(!tymePhase)
 next(.(n) = 获取偏移n个月相的月相对象
 getSolarTime() = 获取月相时刻的公历时间对象
 getSolarDay() = 获取月相时刻的公历日对象

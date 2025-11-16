@@ -100,11 +100,11 @@ SolarTerm = 节气
 SolarTerm.fromIndex(.(year,index) = 根据年份和索引创建节气对象\n参数 @year 为年份\n参数 @index 为节气索引(1-24)\n返回节气对象
 SolarTerm.fromName(.(year,name) = 根据年份和名称创建节气对象\n参数 @year 为年份\n参数 @name 为节气名称\n返回节气对象
 SolarTermDay = 节气日
+SolarTerm.fromIndex() = !tymeSolarTerm.
+SolarTerm.fromName() = !tymeSolarTerm.
 end intellisense**/
 
-/**intellisense(time.tyme.solarterm.SolarTerm)
-fromIndex(.(yeartime.tyme.SolarTerm节气对象
-fromName(.(year,name) = 根据年份和名称创建节气对象
+/**intellisense(!tymeSolarTerm)
 next(.(n) = 获取偏移n个节气的节气对象
 isJie() = 是否为节(奇数索引)
 isQi() = 是否为气(偶数索引)

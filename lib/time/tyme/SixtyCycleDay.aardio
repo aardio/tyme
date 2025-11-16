@@ -490,10 +490,10 @@ SixtyCycleDay = 干支日
 SixtyCycleDay.fromSolarDay(.(solarDay) = 根据公历日创建干支日对象\n参数 @solarDay 为公历日对象\n返回干支日对象
 SixtyCycleHour = 干支时
 SixtyCycleHour.fromSolarTime(.(solarTime) = 根据公历时间创建干支时对象\n参数 @solarTime 为公历时间对象\n返回干支时对象
+SixtyCycleDay.fromSolarDay() = !tymefromSolarDay.
 end intellisense**/
 
-/**intellisense(time.tyme.SixtyCycleDay)
-fromSolarDay(.(solarDay) = 根据公历日创建干支日对象
+/**intellisense(!tymefromSolarDay)
 next(.(n) = 获取偏移n天的干支日对象
 getSolarDay() = 获取公历日对象
 getSixtyCycleMonth() = 获取干支月对象

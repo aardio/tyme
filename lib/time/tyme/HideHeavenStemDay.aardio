@@ -33,7 +33,7 @@ namespace HideHeavenStemDay {
 HideHeavenStemDay = 藏干日
 end intellisense**/
 
-/**intellisense(time.tyme.HideHeavenStemDay.HideHeavenStemDay)
+/**intellisense(!tymeHideHeavenStemDay)
 getHideHeavenStem() = 获取藏干对象
 getName() = 获取名称
 getDayIndex() = 获取天数索引(1-based)

@@ -881,7 +881,7 @@ class LunarDay {
         return owner.solarDay;
     }
 
-     getSixtyCycleDay = function(){
+    getSixtyCycleDay = function(){
         if(!owner.sixtyCycleDay){
             import time.tyme.SixtyCycleDay;
             owner.sixtyCycleDay = ..time.tyme.SixtyCycleDay.fromSolarDay(owner.getSolarDay());
@@ -1163,10 +1163,10 @@ LunarDay = 农历日
 LunarDay.fromYmd(.(year,month,day) = 根据年月日创建农历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(1-30)\n返回农历日对象
 LunarHour = 农历时
 LunarHour.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建农历时对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)\n返回农历时对象
+LunarDay.fromYmd() = !tymeLunarDay.
 end intellisense**/
 
-/**intellisense(time.tyme.LunarDay)
-fromYmd(.(year,month,day) = 根据年月日创建农历日对象
+/**intellisense(!tymeLunarDay)
 next(.(n) = 获取偏移n天的农历日对象
 getLunarMonth() = 获取农历月对象
 getYear() = 获取年份
