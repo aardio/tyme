@@ -2,4 +2,7 @@
 <project ver="10" name="tyme" libEmbed="true" icon="..." ui="win" output="Tyme.exe" CompanyName="aardio" FileDescription="Tyme" LegalCopyright="Copyright (C) aardio 2025" ProductName="产品名称" InternalName="Tyme" FileVersion="0.0.1.001" ProductVersion="0.0.1.001" publishDir="/dist/" dstrip="false" local="false" ignored="false">
 	<file name="main.aardio" path="main.aardio" comment="main.aardio"/>
 	<folder name="资源文件" path="res" embed="true"/>
+	<folder name="测试" path="test" embed="true" comment="目录" local="false" ignored="false">
+		<file name="test1.aardio" path="test\test1.aardio" comment="test\test1.aardio"/>
+	</folder>
 </project>

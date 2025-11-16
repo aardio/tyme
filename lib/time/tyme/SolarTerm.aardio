@@ -1,0 +1,118 @@
+﻿//SolarTerm 节气
+
+import time.tyme.base;
+import time.tyme.JulianDay;
+import time.tyme.ShouXingUtil;
+
+namespace time.tyme;
+
+// ========== SolarTerm 节气 ==========
+class SolarTerm {
+    ctor(year, indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+        var y = self.numeric(year, 'lunar year');
+        if(type(indexOrName) == "number"){
+            var size = #self.NAMES;
+            // 注意：这里 indexOrName 已经是 1-based，需要减 1 参与计算
+            y = ..math.modf((y * size + (indexOrName - 1)) / size);
+        }
+        var jd = ..math.floor((y - 2000) * 365.2422 + 180);
+        var w = ..math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355;
+        if(..time.tyme.ShouXingUtil.calcQi(w) > jd){
+            w -= 365.2422;
+        }
+        this.year = y;
+        // 注意：这里 index 是 0-based
+        this.cursoryJulianDay = ..time.tyme.ShouXingUtil.calcQi(w + 15.2184 * this.index);
+    }
+
+    next = function(n){
+        var size = owner.getSize();
+        var i = owner.index + n;
+        var newYear = ..math.modf((owner.year * size + i) / size);
+        var newIndex = ..time.tyme.AbstractCulture.indexOf(i, size);
+        return self.fromIndex(newYear, newIndex + 1); // 转为 1-based
+    }
+
+    isJie = function(){
+        return owner.index % 2 === 1;
+    }
+
+    isQi = function(){
+        return owner.index % 2 === 0;
+    }
+
+    getJulianDay = function(){
+        return ..time.tyme.JulianDay.fromJulianDay(..time.tyme.ShouXingUtil.qiAccurate2(owner.cursoryJulianDay) + ..time.tyme.JulianDay.J2000);
+    }
+
+    getSolarDay = function(){
+        return ..time.tyme.JulianDay.fromJulianDay(owner.cursoryJulianDay + ..time.tyme.JulianDay.J2000).getSolarDay();
+    }
+
+    getYear = function(){
+        return owner.year;
+    }
+
+    getCursoryJulianDay = function(){
+        return owner.cursoryJulianDay;
+    }
+}
+
+namespace SolarTerm {
+    NAMES = [
+        '冬至', '小寒', '大寒', '立春', '雨水', '惊蛰',
+        '春分', '清明', '谷雨', '立夏', '小满', '芒种',
+        '夏至', '小暑', '大暑', '立秋', '处暑', '白露',
+        '秋分', '寒露', '霜降', '立冬', '小雪', '大雪'
+    ];
+
+    fromIndex = function(year, index){
+        return SolarTerm(year, index);
+    }
+
+    fromName = function(year, name){
+        return SolarTerm(year, name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== SolarTermDay 节气日 ==========
+class SolarTermDay {
+    ctor(solarTerm, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(solarTerm, dayIndex);
+    }
+
+    getSolarTerm = function(){
+        return owner.culture;
+    }
+}
+
+namespace SolarTermDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+SolarTerm = 节气
+SolarTerm.fromIndex(.(year,index) = 根据年份和索引创建节气对象\n参数 @year 为年份\n参数 @index 为节气索引(1-24)\n返回节气对象
+SolarTerm.fromName(.(year,name) = 根据年份和名称创建节气对象\n参数 @year 为年份\n参数 @name 为节气名称\n返回节气对象
+SolarTermDay = 节气日
+end intellisense**/
+
+/**intellisense(time.tyme.solarterm.SolarTerm)
+fromIndex(.(yeartime.tyme.SolarTerm节气对象
+fromName(.(year,name) = 根据年份和名称创建节气对象
+next(.(n) = 获取偏移n个节气的节气对象
+isJie() = 是否为节(奇数索引)
+isQi() = 是否为气(偶数索引)
+getJulianDay() = 获取精确儒略日对象
+getSolarDay() = 获取节气公历日对象
+getYear() = 获取年份
+getCursoryJulianDay() = 获取粗略儒略日数
+getName() = 获取节气名称
+getIndex() = 获取节气索引(1-based)
+toString() = 转为字符串
+end intellisense**/

@@ -1,0 +1,552 @@
+﻿//HeavenStem 干支系统
+
+import time.tyme.base;
+import time.tyme.Element;
+
+namespace time.tyme.HeavenStem{};
+namespace time.tyme;
+
+// ========== HeavenStem 天干 ==========
+class HeavenStem {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getElement = function(){
+        // 甲乙木、丙丁火、戊己土、庚辛金、壬癸水
+        return ..time.tyme.Element.fromIndex(..math.modf(owner.index / 2) + 1);
+    }
+
+    getYinYang = function(){
+        return owner.index % 2 === 0 ? ..time.tyme.YinYang.YANG : ..time.tyme.YinYang.YIN;
+    }
+
+    getTenStar = function(target){
+        var targetIndex = target.index; // 内部使用 0-based
+        var offset = targetIndex - owner.index;
+        if(owner.index % 2 !== 0 && targetIndex % 2 === 0){
+            offset += 2;
+        }
+        return ..time.tyme.TenStar.fromIndex(offset + 1); // 转为 1-based
+    }
+
+    getDirection = function(){
+        return owner.getElement().getDirection();
+    }
+
+    getJoyDirection = function(){
+        var joys = [8, 6, 2, 9, 4]; // 对应甲乙丙丁戊
+        return ..time.tyme.Direction.fromIndex(joys[(owner.index % 5) + 1]);
+    }
+
+    getYangDirection = function(){
+        var yangs = [2, 2, 7, 6, 8, 1, 9, 8, 3, 4];
+        return ..time.tyme.Direction.fromIndex(yangs[owner.index + 1]);
+    }
+
+    getYinDirection = function(){
+        var yins = [8, 1, 6, 7, 2, 2, 8, 9, 4, 3];
+        return ..time.tyme.Direction.fromIndex(yins[owner.index + 1]);
+    }
+
+    getWealthDirection = function(){
+        var wealths = [8, 2, 1, 3, 9];
+        return ..time.tyme.Direction.fromIndex(wealths[..math.modf(owner.index / 2) + 1]);
+    }
+
+    getMascotDirection = function(){
+        var mascots = [4, 4, 3, 3, 1, 9, 2, 2, 6, 7];
+        return ..time.tyme.Direction.fromIndex(mascots[owner.index + 1]);
+    }
+
+    getPengZuHeavenStem = function(){
+        return ..time.tyme.PengZuHeavenStem.fromIndex(owner.getIndex());
+    }
+
+    getTerrain = function(earthBranch){
+        var earthBranchIndex = earthBranch.index; // 内部 0-based
+        var terrains = [2, 7, 11, 10, 11, 10, 8, 1, 5, 4]; // 对应十天干
+        var baseIndex = terrains[owner.index + 1];
+        var offset = ..time.tyme.YinYang.YANG == owner.getYinYang() ? earthBranchIndex : -earthBranchIndex;
+        return ..time.tyme.Terrain.fromIndex(..time.tyme.AbstractCulture.indexOf(baseIndex + offset, 12) + 1);
+    }
+
+    getCombine = function(){
+        return owner.next(5);
+    }
+
+    combine = function(target){
+        if(!owner.getCombine().equals(target)){
+            return null;
+        }
+        // 甲己土、乙庚金、丙辛水、丁壬木、戊癸火
+        return ..time.tyme.Element.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.index + 2, 5) + 1);
+    }
+}
+
+namespace HeavenStem {
+    NAMES = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+
+    fromIndex = function(index){
+        return HeavenStem(self.numeric(index, 'heaven stem index'));
+    }
+
+    fromName = function(name){
+        return HeavenStem(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== EarthBranch 地支 ==========
+class EarthBranch {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getElement = function(){
+        // 子水、丑土、寅木、卯木、辰土、巳火、午火、未土、申金、酉金、戌土、亥水
+        var elements = [5, 3, 1, 1, 3, 2, 2, 3, 4, 4, 3, 5];
+        return ..time.tyme.Element.fromIndex(elements[owner.index + 1]);
+    }
+
+    getYinYang = function(){
+        return owner.index % 2 === 0 ? ..time.tyme.YinYang.YANG : ..time.tyme.YinYang.YIN;
+    }
+
+    getHideHeavenStemMain = function(){
+        var mains = [10, 6, 1, 2, 5, 3, 4, 6, 7, 8, 5, 9]; // 本气藏干
+        return HeavenStem.fromIndex(mains[owner.index + 1]);
+    }
+
+    getHideHeavenStemMiddle = function(){
+        var middles = [0, 10, 3, 0, 2, 7, 6, 4, 9, 0, 8, 1]; // 中气藏干，0表示无
+        var n = middles[owner.index + 1];
+        return n === 0 ? null : HeavenStem.fromIndex(n);
+    }
+
+    getHideHeavenStemResidual = function(){
+        var residuals = [0, 8, 5, 0, 10, 5, 0, 2, 5, 0, 4, 0]; // 余气藏干，0表示无
+        var n = residuals[owner.index + 1];
+        return n === 0 ? null : HeavenStem.fromIndex(n);
+    }
+
+    getHideHeavenStems = function(){
+        var l = {};
+        ..table.push(l, ..time.tyme.HideHeavenStemDay(owner.getHideHeavenStemMain(), ..time.tyme.HideHeavenStemDayType.MAIN));
+        var o = owner.getHideHeavenStemMiddle();
+        if(o){
+            ..table.push(l, ..time.tyme.HideHeavenStemDay(o, ..time.tyme.HideHeavenStemDayType.MIDDLE));
+        }
+        o = owner.getHideHeavenStemResidual();
+        if(o){
+            ..table.push(l, ..time.tyme.HideHeavenStemDay(o, ..time.tyme.HideHeavenStemDayType.RESIDUAL));
+        }
+        return l;
+    }
+
+    getZodiac = function(){
+        return ..time.tyme.Zodiac.fromIndex(owner.getIndex());
+    }
+
+    getDirection = function(){
+        var directions = [1, 5, 3, 3, 5, 9, 9, 5, 7, 7, 5, 1];
+        return ..time.tyme.Direction.fromIndex(directions[owner.index + 1]);
+    }
+
+    getOpposite = function(){
+        return owner.next(6);
+    }
+
+    getOminous = function(){
+        var ominous = [9, 3, 1, 7];
+        return ..time.tyme.Direction.fromIndex(ominous[(owner.index % 4) + 1]);
+    }
+
+    getPengZuEarthBranch = function(){
+        return ..time.tyme.PengZuEarthBranch.fromIndex(owner.getIndex());
+    }
+
+    getCombine = function(){
+        // 子丑合、寅亥合、卯戌合、辰酉合、巳申合、午未合
+        return self.fromIndex(..time.tyme.AbstractCulture.indexOf(1 - owner.index, 12) + 1);
+    }
+
+    getHarm = function(){
+        // 子未害、丑午害、寅巳害、卯辰害、申亥害、酉戌害
+        return self.fromIndex(..time.tyme.AbstractCulture.indexOf(19 - owner.index, 12) + 1);
+    }
+
+    combine = function(target){
+        if(!owner.getCombine().equals(target)){
+            return null;
+        }
+        var elements = [3, 3, 1, 2, 4, 5, 3, 3, 5, 4, 2, 1];
+        return ..time.tyme.Element.fromIndex(elements[owner.index + 1]);
+    }
+}
+
+namespace EarthBranch {
+    NAMES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+    fromIndex = function(index){
+        return EarthBranch(self.numeric(index, 'earth branch index'));
+    }
+
+    fromName = function(name){
+        return EarthBranch(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Zodiac 生肖 ==========
+class Zodiac {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getEarthBranch = function(){
+        return EarthBranch.fromIndex(owner.getIndex());
+    }
+}
+
+namespace Zodiac {
+    NAMES = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+
+    fromIndex = function(index){
+        return Zodiac(self.numeric(index, 'zodiac index'));
+    }
+
+    fromName = function(name){
+        return Zodiac(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== SixtyCycle 六十甲子 ==========
+class SixtyCycle {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getHeavenStem = function(){
+        return HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.index, 10) + 1);
+    }
+
+    getEarthBranch = function(){
+        return EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.index, 12) + 1);
+    }
+
+    getSound = function(){
+        return ..time.tyme.Sound.fromIndex(..math.modf(owner.index / 2) + 1);
+    }
+
+    getPengZu = function(){
+        return ..time.tyme.PengZu.fromSixtyCycle(owner);
+    }
+
+    getTen = function(){
+        return ..time.tyme.Ten.fromIndex(..math.modf((owner.getHeavenStem().index - owner.getEarthBranch().index) / 2) + 1);
+    }
+
+    getExtraEarthBranches = function(){
+        var l = {};
+        var base = ..time.tyme.AbstractCulture.indexOf(10 + owner.getEarthBranch().index - owner.getHeavenStem().index, 12);
+        l[1] = EarthBranch.fromIndex(base + 1);
+        l[2] = EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(base + 1, 12) + 1);
+        return l;
+    }
+}
+
+namespace SixtyCycle {
+    NAMES = [
+        '甲子', '乙丑', '丙寅', '丁卯', '戊辰', '己巳', '庚午', '辛未', '壬申', '癸酉',
+        '甲戌', '乙亥', '丙子', '丁丑', '戊寅', '己卯', '庚辰', '辛巳', '壬午', '癸未',
+        '甲申', '乙酉', '丙戌', '丁亥', '戊子', '己丑', '庚寅', '辛卯', '壬辰', '癸巳',
+        '甲午', '乙未', '丙申', '丁酉', '戊戌', '己亥', '庚子', '辛丑', '壬寅', '癸卯',
+        '甲辰', '乙巳', '丙午', '丁未', '戊申', '己酉', '庚戌', '辛亥', '壬子', '癸丑',
+        '甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'
+    ];
+
+    fromIndex = function(index){
+        return SixtyCycle(self.numeric(index, 'sixty cycle index'));
+    }
+
+    fromName = function(name){
+        return SixtyCycle(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== 其他干支相关类 ==========
+class Sound {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Sound {
+    NAMES = [
+        '海中金', '炉中火', '大林木', '路旁土', '剑锋金', '山头火',
+        '涧下水', '城头土', '白蜡金', '杨柳木', '泉中水', '屋上土',
+        '霹雳火', '松柏木', '长流水', '沙中金', '山下火', '平地木',
+        '壁上土', '金箔金', '覆灯火', '天河水', '大驿土', '钗钏金',
+        '桑柘木', '大溪水', '沙中土', '天上火', '石榴木', '大海水'
+    ];
+
+    fromIndex = function(index){
+        return Sound(self.numeric(index, 'sound index'));
+    }
+
+    fromName = function(name){
+        return Sound(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class Ten {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Ten {
+    NAMES = ['甲子', '甲戌', '甲申', '甲午', '甲辰', '甲寅'];
+
+    fromIndex = function(index){
+        return Ten(self.numeric(index, 'ten index'));
+    }
+
+    fromName = function(name){
+        return Ten(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class Terrain {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Terrain {
+    NAMES = ['长生', '沐浴', '冠带', '临官', '帝旺', '衰', '病', '死', '墓', '绝', '胎', '养'];
+
+    fromIndex = function(index){
+        return Terrain(self.numeric(index, 'terrain index'));
+    }
+
+    fromName = function(name){
+        return Terrain(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class TenStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace TenStar {
+    NAMES = ['比肩', '劫财', '食神', '伤官', '偏财', '正财', '七杀', '正官', '偏印', '正印'];
+
+    fromIndex = function(index){
+        return TenStar(self.numeric(index, 'ten star index'));
+    }
+
+    fromName = function(name){
+        return TenStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class PengZuHeavenStem {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace PengZuHeavenStem {
+    NAMES = [
+        '甲不开仓财物耗散', '乙不栽植千株不长', '丙不修灶必见灾殃', '丁不剃头头必生疮',
+        '戊不受田田主不祥', '己不破券二比并亡', '庚不经络织机虚张', '辛不合酱主人不尝',
+        '壬不泱水更难提防', '癸不词讼理弱敌强'
+    ];
+
+    fromIndex = function(index){
+        return PengZuHeavenStem(self.numeric(index, 'peng zu heaven stem index'));
+    }
+
+    fromName = function(name){
+        return PengZuHeavenStem(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class PengZuEarthBranch {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace PengZuEarthBranch {
+    NAMES = [
+        '子不问卜自惹祸殃', '丑不冠带主不还乡', '寅不祭祀神鬼不尝', '卯不穿井水泉不香',
+        '辰不哭泣必主重丧', '巳不远行财物伏藏', '午不苫盖屋主更张', '未不服药毒气入肠',
+        '申不安床鬼祟入房', '酉不会客醉坐颠狂', '戌不吃犬作怪上床', '亥不嫁娶不利新郎'
+    ];
+
+    fromIndex = function(index){
+        return PengZuEarthBranch(self.numeric(index, 'peng zu earth branch index'));
+    }
+
+    fromName = function(name){
+        return PengZuEarthBranch(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+class PengZu {
+    ctor(sixtyCycle){
+        this = ..time.tyme.AbstractCulture();
+        this.pengZuHeavenStem = PengZuHeavenStem.fromIndex(sixtyCycle.getHeavenStem().getIndex());
+        this.pengZuEarthBranch = PengZuEarthBranch.fromIndex(sixtyCycle.getEarthBranch().getIndex());
+    }
+
+    getName = function(){
+        return owner.pengZuHeavenStem.getName() ++ " " ++ owner.pengZuEarthBranch.getName();
+    }
+
+    getPengZuHeavenStem = function(){
+        return owner.pengZuHeavenStem;
+    }
+
+    getPengZuEarthBranch = function(){
+        return owner.pengZuEarthBranch;
+    }
+}
+
+namespace PengZu {
+    fromSixtyCycle = function(sixtyCycle){
+        return PengZu(sixtyCycle);
+    }
+
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+class HideHeavenStem {
+    ctor(heavenStem, typ){
+        this = ..time.tyme.AbstractCulture();
+        if(type(heavenStem) == "number"){
+            this.heavenStem = HeavenStem.fromIndex(heavenStem);
+        }
+        else if(type(heavenStem) == "string"){
+            this.heavenStem = HeavenStem.fromName(heavenStem);
+        }
+        else {
+            this.heavenStem = heavenStem;
+        }
+        this.type = typ;
+    }
+
+    getName = function(){
+        return owner.heavenStem.getName();
+    }
+
+    getHeavenStem = function(){
+        return owner.heavenStem;
+    }
+
+    getType = function(){
+        return owner.type;
+    }
+}
+
+namespace HideHeavenStem {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+/**intellisense(time.tyme)
+HeavenStem = 天干
+HeavenStem.fromIndex(.(index) = 根据索引创建天干对象\n参数 @index 为索引值(1-10)\n返回天干对象
+HeavenStem.fromName(.(name) = 根据名称创建天干对象\n参数 @name 为天干名称\n返回天干对象
+EarthBranch = 地支
+EarthBranch.fromIndex(.(index) = 根据索引创建地支对象\n参数 @index 为索引值(1-12)\n返回地支对象
+EarthBranch.fromName(.(name) = 根据名称创建地支对象\n参数 @name 为地支名称\n返回地支对象
+Zodiac = 生肖
+Zodiac.fromIndex(.(index) = 根据索引创建生肖对象\n参数 @index 为索引值(1-12)\n返回生肖对象
+Zodiac.fromName(.(name) = 根据名称创建生肖对象\n参数 @name 为生肖名称\n返回生肖对象
+SixtyCycle = 六十甲子
+SixtyCycle.fromIndex(.(index) = 根据索引创建六十甲子对象\n参数 @index 为索引值(1-60)\n返回六十甲子对象
+SixtyCycle.fromName(.(name) = 根据名称创建六十甲子对象\n参数 @name 为干支名称\n返回六十甲子对象
+Sound = 纳音
+Ten = 旬
+Terrain = 十二长生
+TenStar = 十神
+PengZuHeavenStem = 彭祖百忌天干
+PengZuEarthBranch = 彭祖百忌地支
+PengZu = 彭祖百忌
+HideHeavenStem = 藏干
+end intellisense**/

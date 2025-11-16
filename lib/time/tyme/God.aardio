@@ -1,0 +1,89 @@
+﻿//God 神煞
+import time.tyme.base;
+import time.tyme.data;
+
+namespace time.tyme;
+
+class God {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getLuck = function(){
+        import time.tyme.star;
+        return ..time.tyme.Luck.fromIndex(owner.index < 60 ? 1 : 2);
+    }
+}
+
+namespace God {
+    NAMES = [
+        '天恩', '鸣吠', '母仓', '不将', '四相', '鸣吠对', '五合', '三合', '除神', '月德',
+        '月空', '月德合', '月恩', '时阴', '五富', '生气', '金匮', '相日', '阴德', '六合',
+        '益后', '青龙', '续世', '明堂', '王日', '要安', '官日', '吉期', '福德', '六仪',
+        '金堂', '宝光', '民日', '临日', '天马', '敬安', '普护', '驿马', '天后', '阳德',
+        '天喜', '天医', '司命', '圣心', '玉宇', '守日', '时德', '解神', '时阳', '天仓',
+        '天巫', '玉堂', '福生', '天德', '天德合', '天愿', '天赦', '天符', '阴神', '解除',
+        '五虚', '五离', '重日', '复日', '血支', '天贼', '土符', '游祸', '白虎', '小耗',
+        '致死', '河魁', '劫煞', '月煞', '月建', '往亡', '大时', '大败', '咸池', '厌对',
+        '招摇', '九坎', '九焦', '天罡', '死神', '月害', '死气', '月破', '大耗', '天牢',
+        '元武', '月厌', '月虚', '归忌', '小时', '天刑', '朱雀', '九空', '天吏', '地火',
+        '四击', '大煞', '勾陈', '八专', '灾煞', '天火', '血忌', '土府', '月刑', '触水龙',
+        '地囊', '八风', '四废', '四忌', '四穷', '五墓', '阴错', '四耗', '阳错', '孤辰',
+        '小会', '大会', '八龙', '七鸟', '九虎', '六蛇', '天狗', '行狠', '了戾', '岁薄',
+        '逐阵', '三丧', '三阴', '阴道冲阳', '阴位', '阴阳交破', '阴阳俱错', '阴阳击冲',
+        '鬼哭', '单阴', '绝阴', '纯阳', '阳错阴冲', '七符', '成日', '孤阳', '绝阳', '纯阴',
+        '大退', '四离', '阳破阴冲'
+    ];
+
+    _dayGods = ..time.tyme._dayGods;
+
+    fromIndex = function(index){
+        return God(self.numeric(index, 'god index'));
+    }
+
+    fromName = function(name){
+        return God(name);
+    }
+
+    getDayGods = function(month, day){
+        var l = {};
+        // month 和 day 都是 SixtyCycle 对象
+        var monthBranchIndex = month.getEarthBranch().next(-2).index; // 0-based
+        var dayIndex = day.index; // 0-based
+        var index = ..string.format("%02X", dayIndex);
+        var pattern = ";" ++ index ++ "(.[^;]*)";
+        var matcher = ..string.match(self._dayGods[monthBranchIndex + 1], pattern);
+        if(matcher){
+            var data = matcher;
+            for(i=1; #data; 2){
+                var godIndex = tonumber(..string.slice(data, i, i + 1), 16);
+                ..table.push(l, self.fromIndex(godIndex + 1)); // 转为 1-based
+            }
+        }
+        return l;
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+God = 神煞
+God.fromIndex(.(index) = 根据索引创建神煞对象\n参数 @index 为索引值(1-141)\n返回神煞对象
+God.fromName(.(name) = 根据名称创建神煞对象\n参数 @name 为神煞名称\n返回神煞对象
+God.getDayGods(.(month,day) = 获取日神煞列表\n参数 @month 为月干支对象\n参数 @day 为日干支对象\n返回神煞对象数组
+end intellisense**/
+
+/**intellisense(time.tyme.God)
+fromIndex(.(index) = 根据索引创建神煞对象
+fromName(.(name) = 根据名称创建神煞对象
+next(.(n) = 获取偏移n个位置的神煞对象
+getLuck() = 获取吉凶对象
+getName() = 获取名称
+getIndex() = 获取索引(1-based)
+toString() = 转为字符串
+end intellisense**/

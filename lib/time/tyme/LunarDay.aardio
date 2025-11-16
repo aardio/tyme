@@ -1,0 +1,1201 @@
+﻿//LunarDay 农历
+
+import time.tyme.base;
+import time.tyme.JulianDay;
+import time.tyme.ShouXingUtil;
+import time.tyme.HeavenStem;
+import time.tyme.star;
+
+namespace time.tyme.LunarDay{};
+namespace time.tyme;
+
+// ========== LunarYear 农历年 ==========
+class LunarYear {
+    ctor(year){
+        this = ..time.tyme.AbstractTyme();
+        self.init();
+        var y = self.numeric(year, 'lunar year');
+        if(y < -1 || y > 9999){
+            error("illegal lunar year: " ++ tostring(year), 2);
+        }
+        this.year = y;
+    }
+
+    getYear = function(){
+        return owner.year;
+    }
+
+    getDayCount = function(){
+        var n = 0;
+        var months = owner.getMonths();
+        for(i=1; #months){
+            n += months[i].getDayCount();
+        }
+        return n;
+    }
+
+    getMonthCount = function(){
+        return owner.getLeapMonth() < 1 ? 12 : 13;
+    }
+
+    getName = function(){
+        return "农历" ++ owner.getSixtyCycle().getName() ++ "年";
+    }
+
+    next = function(n){
+        return self.fromYear(owner.year + n);
+    }
+
+    getLeapMonth = function(){
+        if(owner.year === -1){
+            return 11;
+        }
+        for(i=1; #self.LEAP){
+            if(..table.find(self.LEAP[i], owner.year)){
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    getSixtyCycle = function(){
+        return ..time.tyme.SixtyCycle.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.year - 4, 60) + 1);
+    }
+
+    getTwenty = function(){
+        return ..time.tyme.Twenty.fromIndex(..math.floor((owner.year - 1864) / 20) + 1);
+    }
+
+    getNineStar = function(){
+        return ..time.tyme.NineStar.fromIndex(..time.tyme.AbstractCulture.indexOf(63 + owner.getTwenty().getSixty().index * 3 - owner.getSixtyCycle().index, 9) + 1);
+    }
+
+    getJupiterDirection = function(){
+        var directions = [1,8,8,3,4,4,9,2,2,7,1,1];
+        return ..time.tyme.Direction.fromIndex(directions[owner.getSixtyCycle().getEarthBranch().index + 1]);
+    }
+
+    getFirstMonth = function(){
+        return LunarMonth.fromYm(owner.year, 1);
+    }
+
+    getMonths = function(){
+        var l = {};
+        var m = owner.getFirstMonth();
+        while(m.getYear() === owner.year){
+            ..table.push(l, m);
+            m = m.next(1);
+        }
+        return l;
+    }
+
+    getKitchenGodSteed = function(){
+        return ..time.tyme.KitchenGodSteed.fromLunarYear(owner.year);
+    }
+}
+
+namespace LunarYear {
+    isInit = false;
+    LEAP = {};
+
+    init = function(){
+        if(self.isInit){
+            return;
+        }
+        var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@';
+        import time.tyme.data;
+        var months = ..time.tyme._lunarYearMonths;
+
+        for(i=1; 12){
+            var n = 0;
+            var m = months[i];
+            var size = ..math.modf(#m / 2);
+            var l = {};
+            for(y=0; size - 1){
+                var z = y * 2;
+                var t = 0;
+                var c = 1;
+                for(x=1; 0; -1){
+                    t += c * (..string.find(chars, ..string.slice(m, z + x + 1, z + x + 1)) - 1);
+                    c *= 64;
+                }
+                n += t;
+                ..table.push(l, n);
+            }
+            self.LEAP[i] = l;
+        }
+        self.isInit = true;
+    }
+
+    fromYear = function(year){
+        return LunarYear(year);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarSeason 农历季节 ==========
+class LunarSeason {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace LunarSeason {
+    NAMES = ['孟春', '仲春', '季春', '孟夏', '仲夏', '季夏', '孟秋', '仲秋', '季秋', '孟冬', '仲冬', '季冬'];
+
+    fromIndex = function(index){
+        return LunarSeason(self.numeric(index, 'lunar season index'));
+    }
+
+    fromName = function(name){
+        return LunarSeason(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== LunarMonth 农历月 ==========
+class LunarMonth {
+    ctor(year, month, cache){
+        this = ..time.tyme.AbstractTyme();
+        if(cache){
+            var m = cache[2];
+            this.year = LunarYear.fromYear(cache[1]);
+            this.month = ..math.abs(m);
+            this.leap = m < 0;
+            this.dayCount = cache[3];
+            this.indexInYear = cache[4];
+            this.firstJulianDay = ..time.tyme.JulianDay.fromJulianDay(cache[5]);
+        }
+        else {
+            var t = self.numeric(month, 'lunar month');
+            if(t === 0 || t > 12 || t < -12){
+                error("illegal lunar month: " ++ tostring(month), 2);
+            }
+            var currentYear = LunarYear.fromYear(year);
+            var y = currentYear.getYear();
+            var currentLeapMonth = currentYear.getLeapMonth();
+            var leap = t < 0;
+            var m = ..math.abs(t);
+            if(leap && m != currentLeapMonth){
+                error("illegal leap month " ++ tostring(m) ++ " in lunar year " ++ tostring(year), 2);
+            }
+
+            var dongZhiJd = ..time.tyme.SolarTerm.fromIndex(y, 1).getCursoryJulianDay(); // 冬至是第1个节气(1-based)
+            var w = ..time.tyme.ShouXingUtil.calcShuo(dongZhiJd);
+            if(w > dongZhiJd){
+                w -= 29.53;
+            }
+
+            var offset = 2;
+            if(y > 8 && y < 24){
+                offset = 1;
+            }
+            elseif(LunarYear.fromYear(y - 1).getLeapMonth() > 10 && y != 239 && y != 240){
+                offset = 3;
+            }
+
+            var index = m - 1; // 内部使用 0-based
+            if(leap || (currentLeapMonth > 0 && m > currentLeapMonth)){
+                index += 1;
+            }
+            this.indexInYear = index;
+
+            w += 29.5306 * (offset + index);
+            var firstDay = ..time.tyme.ShouXingUtil.calcShuo(w);
+            this.firstJulianDay = ..time.tyme.JulianDay.fromJulianDay(..time.tyme.JulianDay.J2000 + firstDay);
+            this.dayCount = ..math.modf(..time.tyme.ShouXingUtil.calcShuo(w + 29.5306) - firstDay);
+            this.year = currentYear;
+            this.month = m;
+            this.leap = leap;
+        }
+    }
+
+    getLunarYear = function(){
+        return owner.year;
+    }
+
+    getYear = function(){
+        return owner.year.getYear();
+    }
+
+    getMonth = function(){
+        return owner.month;
+    }
+
+    getMonthWithLeap = function(){
+        return owner.leap ? -owner.month : owner.month;
+    }
+
+    getDayCount = function(){
+        return owner.dayCount;
+    }
+
+    getIndexInYear = function(){
+        return owner.indexInYear + 1; // 返回 1-based
+    }
+
+    getSeason = function(){
+        return LunarSeason.fromIndex(owner.month);
+    }
+
+    getFirstJulianDay = function(){
+        return owner.firstJulianDay;
+    }
+
+    isLeap = function(){
+        return owner.leap;
+    }
+
+    getWeekCount = function(start){
+        // start 是 1-based
+        return ..math.ceil((..time.tyme.AbstractCulture.indexOf(owner.firstJulianDay.getWeek().index - (start - 1), 7) + owner.getDayCount()) / 7);
+    }
+
+    getName = function(){
+        return (owner.leap ? '闰' : '') ++ self.NAMES[owner.month];
+    }
+
+    toString = function(){
+        return tostring(owner.year) ++ owner.getName();
+    }
+
+    next = function(n){
+        if(n === 0){
+            return self.fromYm(owner.getYear(), owner.getMonthWithLeap());
+        }
+        var m = owner.indexInYear + 1 + n;
+        var y = owner.year;
+        if(n > 0){
+            var monthCount = y.getMonthCount();
+            while(m > monthCount){
+                m -= monthCount;
+                y = y.next(1);
+                monthCount = y.getMonthCount();
+            }
+        }
+        else {
+            while(m <= 0){
+                y = y.next(-1);
+                m += y.getMonthCount();
+            }
+        }
+        var leap = false;
+        var leapMonth = y.getLeapMonth();
+        if(leapMonth > 0){
+            if(m === leapMonth + 1){
+                leap = true;
+            }
+            if(m > leapMonth){
+                m--;
+            }
+        }
+        return self.fromYm(y.getYear(), leap ? -m : m);
+    }
+
+    getDays = function(){
+        var y = owner.getYear();
+        var m = owner.getMonthWithLeap();
+        var l = {};
+        for(i=1; owner.getDayCount()){
+            ..table.push(l, LunarDay.fromYmd(y, m, i));
+        }
+        return l;
+    }
+
+    getWeeks = function(start){
+        var y = owner.getYear();
+        var m = owner.getMonthWithLeap();
+        var l = {};
+        for(i=1; owner.getWeekCount(start)){
+            ..table.push(l, LunarWeek.fromYm(y, m, i, start));
+        }
+        return l;
+    }
+
+    getSixtyCycle = function(){
+        var yearStem = owner.year.getSixtyCycle().getHeavenStem();
+        var stemIndex = yearStem.index * 2 + owner.month + 1; // 0-based 计算
+        var branchIndex = owner.month + 1; // 0-based 计算
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName() 
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(branchIndex, 12) + 1).getName()
+        );
+    }
+
+    getNineStar = function(){
+        var index = owner.getSixtyCycle().getEarthBranch().index;
+        if(index < 2){
+            index += 3;
+        }
+        return ..time.tyme.NineStar.fromIndex(..time.tyme.AbstractCulture.indexOf(27 - owner.year.getSixtyCycle().getEarthBranch().index % 3 * 3 - index, 9) + 1);
+    }
+
+    getJupiterDirection = function(){
+        var sixtyCycle = owner.getSixtyCycle();
+        var branchIndex = sixtyCycle.getEarthBranch().next(-2).index;
+        var n = ([8, 0, 2, 4])[..time.tyme.AbstractCulture.indexOf(branchIndex, 4) + 1]; // 0表示无方向
+        return n !== 0 ? ..time.tyme.Direction.fromIndex(n) : sixtyCycle.getHeavenStem().getDirection();
+    }
+
+    getFetus = function(){
+        import time.tyme.fetus;
+        return ..time.tyme.FetusMonth.fromLunarMonth(owner);
+    }
+
+    getMinorRen = function(){
+        return ..time.tyme.MinorRen.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.month - 1, 6) + 1);
+    }
+}
+
+namespace LunarYear {
+    isInit = false;
+    LEAP = {};
+
+    init = function(){
+        if(self.isInit){
+            return;
+        }
+        var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@';
+        import time.tyme.data;
+        var months = ..time.tyme._lunarYearMonths;
+
+        for(i=1; 12){
+            var n = 0;
+            var m = months[i];
+            var size = ..math.modf(#m / 2);
+            var l = {};
+            for(y=0; size - 1){
+                var z = y * 2;
+                var t = 0;
+                var c = 1;
+                for(x=1; 0; -1){
+                    t += c * (..string.find(chars, ..string.slice(m, z + x + 1, z + x + 1)) - 1);
+                    c *= 64;
+                }
+                n += t;
+                ..table.push(l, n);
+            }
+            self.LEAP[i] = l;
+        }
+        self.isInit = true;
+    }
+
+    fromYear = function(year){
+        return LunarYear(year);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarMonth 农历月 ==========
+class LunarMonth {
+    ctor(year, month, cache){
+        this = ..time.tyme.AbstractTyme();
+        if(cache){
+            var m = cache[2];
+            this.year = LunarYear.fromYear(cache[1]);
+            this.month = ..math.abs(m);
+            this.leap = m < 0;
+            this.dayCount = cache[3];
+            this.indexInYear = cache[4];
+            this.firstJulianDay = ..time.tyme.JulianDay.fromJulianDay(cache[5]);
+        }
+        else {
+            var t = self.numeric(month, 'lunar month');
+            if(t === 0 || t > 12 || t < -12){
+                error("illegal lunar month: " ++ tostring(month), 2);
+            }
+            var currentYear = LunarYear.fromYear(year);
+            var y = currentYear.getYear();
+            var currentLeapMonth = currentYear.getLeapMonth();
+            var leap = t < 0;
+            var m = ..math.abs(t);
+            if(leap && m != currentLeapMonth){
+                error("illegal leap month " ++ tostring(m) ++ " in lunar year " ++ tostring(year), 2);
+            }
+
+            import time.tyme.SolarTerm;
+            var dongZhiJd = ..time.tyme.SolarTerm.fromIndex(y, 1).getCursoryJulianDay();
+            var w = ..time.tyme.ShouXingUtil.calcShuo(dongZhiJd);
+            if(w > dongZhiJd){
+                w -= 29.53;
+            }
+
+            var offset = 2;
+            if(y > 8 && y < 24){
+                offset = 1;
+            }
+            elseif(LunarYear.fromYear(y - 1).getLeapMonth() > 10 && y != 239 && y != 240){
+                offset = 3;
+            }
+
+            var index = m - 1; // 内部 0-based
+            if(leap || (currentLeapMonth > 0 && m > currentLeapMonth)){
+                index += 1;
+            }
+            this.indexInYear = index;
+
+            w += 29.5306 * (offset + index);
+            var firstDay = ..time.tyme.ShouXingUtil.calcShuo(w);
+            this.firstJulianDay = ..time.tyme.JulianDay.fromJulianDay(..time.tyme.JulianDay.J2000 + firstDay);
+            this.dayCount = ..math.modf(..time.tyme.ShouXingUtil.calcShuo(w + 29.5306) - firstDay);
+            this.year = currentYear;
+            this.month = m;
+            this.leap = leap;
+        }
+    }
+
+    getLunarYear = function(){
+        return owner.year;
+    }
+
+    getYear = function(){
+        return owner.year.getYear();
+    }
+
+    getMonth = function(){
+        return owner.month;
+    }
+
+    getMonthWithLeap = function(){
+        return owner.leap ? -owner.month : owner.month;
+    }
+
+    getDayCount = function(){
+        return owner.dayCount;
+    }
+
+    getIndexInYear = function(){
+        return owner.indexInYear + 1; // 返回 1-based
+    }
+
+    getSeason = function(){
+        return LunarSeason.fromIndex(owner.month);
+    }
+
+    getFirstJulianDay = function(){
+        return owner.firstJulianDay;
+    }
+
+    isLeap = function(){
+        return owner.leap;
+    }
+
+    getWeekCount = function(start){
+        // start 是 1-based
+        return ..math.ceil((..time.tyme.AbstractCulture.indexOf(owner.firstJulianDay.getWeek().index - (start - 1), 7) + owner.getDayCount()) / 7);
+    }
+
+    getName = function(){
+        return (owner.leap ? '闰' : '') ++ self.NAMES[owner.month];
+    }
+
+    toString = function(){
+        return tostring(owner.year) ++ owner.getName();
+    }
+
+    next = function(n){
+        if(n === 0){
+            return self.fromYm(owner.getYear(), owner.getMonthWithLeap());
+        }
+        var m = owner.indexInYear + 1 + n;
+        var y = owner.year;
+        if(n > 0){
+            var monthCount = y.getMonthCount();
+            while(m > monthCount){
+                m -= monthCount;
+                y = y.next(1);
+                monthCount = y.getMonthCount();
+            }
+        }
+        else {
+            while(m <= 0){
+                y = y.next(-1);
+                m += y.getMonthCount();
+            }
+        }
+        var leap = false;
+        var leapMonth = y.getLeapMonth();
+        if(leapMonth > 0){
+            if(m === leapMonth + 1){
+                leap = true;
+            }
+            if(m > leapMonth){
+                m--;
+            }
+        }
+        return self.fromYm(y.getYear(), leap ? -m : m);
+    }
+
+    getDays = function(){
+        var y = owner.getYear();
+        var m = owner.getMonthWithLeap();
+        var l = {};
+        for(i=1; owner.getDayCount()){
+            ..table.push(l, LunarDay.fromYmd(y, m, i));
+        }
+        return l;
+    }
+
+    getWeeks = function(start){
+        var y = owner.getYear();
+        var m = owner.getMonthWithLeap();
+        var l = {};
+        for(i=1; owner.getWeekCount(start)){
+            ..table.push(l, LunarWeek.fromYm(y, m, i, start));
+        }
+        return l;
+    }
+
+    getSixtyCycle = function(){
+        var yearStem = owner.year.getSixtyCycle().getHeavenStem();
+        var stemIndex = yearStem.index * 2 + owner.month + 1;
+        var branchIndex = owner.month + 1;
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(branchIndex, 12) + 1).getName()
+        );
+    }
+
+    getNineStar = function(){
+        var index = owner.getSixtyCycle().getEarthBranch().index;
+        if(index < 2){
+            index += 3;
+        }
+        return ..time.tyme.NineStar.fromIndex(..time.tyme.AbstractCulture.indexOf(27 - owner.year.getSixtyCycle().getEarthBranch().index % 3 * 3 - index, 9) + 1);
+    }
+
+    getJupiterDirection = function(){
+        var sixtyCycle = owner.getSixtyCycle();
+        var branchIndex = sixtyCycle.getEarthBranch().next(-2).index;
+        var n = ([8, 0, 2, 4])[..time.tyme.AbstractCulture.indexOf(branchIndex, 4) + 1];
+        return n !== 0 ? ..time.tyme.Direction.fromIndex(n) : sixtyCycle.getHeavenStem().getDirection();
+    }
+
+    getFetus = function(){
+        import time.tyme.fetus;
+        return ..time.tyme.FetusMonth.fromLunarMonth(owner);
+    }
+
+    getMinorRen = function(){
+        return ..time.tyme.MinorRen.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.month - 1, 6) + 1);
+    }
+}
+
+namespace LunarMonth {
+    cache = {};
+    NAMES = ['正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+    fromYm = function(year, month){
+        var m;
+        var key = tostring(year) ++ tostring(month);
+        var cache = self.cache[key];
+        if(cache){
+            m = LunarMonth(0, 0, cache);
+        }
+        else {
+            m = LunarMonth(year, month);
+            self.cache[key] = [m.getYear(), m.getMonthWithLeap(), m.getDayCount(), m.indexInYear, m.getFirstJulianDay().getDay()];
+        }
+        return m;
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarWeek 农历周 ==========
+class LunarWeek {
+    ctor(year, month, index, start){
+        this = ..time.tyme.AbstractTyme();
+        var i = self.numeric(index, 'lunar week index');
+        if(i < 1 || i > 6){
+            error("illegal lunar week index: " ++ tostring(index), 2);
+        }
+        var t = ..time.tyme.Week.fromIndex(start);
+        var m = LunarMonth.fromYm(year, month);
+        if(i > m.getWeekCount(t.getIndex())){
+            error("illegal lunar week index: " ++ tostring(index) ++ " in month: " ++ tostring(m), 2);
+        }
+        this.month = m;
+        this.index = i - 1; // 内部 0-based
+        this.start = t;
+    }
+
+    getLunarMonth = function(){
+        return owner.month;
+    }
+
+    getYear = function(){
+        return owner.month.getYear();
+    }
+
+    getMonth = function(){
+        return owner.month.getMonthWithLeap();
+    }
+
+    getIndex = function(){
+        return owner.index + 1; // 返回 1-based
+    }
+
+    getStart = function(){
+        return owner.start;
+    }
+
+    getName = function(){
+        return self.NAMES[owner.index + 1];
+    }
+
+    toString = function(){
+        return tostring(owner.month) ++ owner.getName();
+    }
+
+    next = function(n){
+        var startIndex = owner.start.index;
+        if(n === 0){
+            return self.fromYm(owner.getYear(), owner.getMonth(), owner.getIndex(), owner.start.getIndex());
+        }
+        var d = owner.index;
+        var m = owner.month;
+        if(n > 0){
+            d += n;
+            var weekCount = m.getWeekCount(owner.start.getIndex());
+            while(d >= weekCount){
+                d -= weekCount;
+                m = m.next(1);
+                if(!LunarDay.fromYmd(m.getYear(), m.getMonthWithLeap(), 1).getWeek().equals(owner.start)){
+                    d += 1;
+                }
+                weekCount = m.getWeekCount(owner.start.getIndex());
+            }
+        }
+        else {
+            while(d < 0){
+                if(!LunarDay.fromYmd(m.getYear(), m.getMonthWithLeap(), 1).getWeek().equals(owner.start)){
+                    d -= 1;
+                }
+                m = m.next(-1);
+                d += m.getWeekCount(owner.start.getIndex());
+            }
+        }
+        return self.fromYm(m.getYear(), m.getMonthWithLeap(), d + 1, owner.start.getIndex());
+    }
+
+    getFirstDay = function(){
+        var firstDay = LunarDay.fromYmd(owner.getYear(), owner.getMonth(), 1);
+        return firstDay.next(owner.index * 7 - ..time.tyme.AbstractCulture.indexOf(firstDay.getWeek().index - owner.start.index, 7));
+    }
+
+    getDays = function(){
+        var l = {};
+        var d = owner.getFirstDay();
+        ..table.push(l, d);
+        for(i=1; 6){
+            ..table.push(l, d.next(i));
+        }
+        return l;
+    }
+
+    equals = function(o){
+        return o && o.getFirstDay().equals(owner.getFirstDay());
+    }
+}
+
+namespace LunarWeek {
+    NAMES = ['第一周', '第二周', '第三周', '第四周', '第五周', '第六周'];
+
+    fromYm = function(year, month, index, start){
+        return LunarWeek(year, month, index, start);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarDay 农历日 ==========
+class LunarDay {
+    ctor(year, month, day){
+        this = ..time.tyme.AbstractTyme();
+        var m = LunarMonth.fromYm(year, month);
+        var d = self.numeric(day, 'lunar day');
+        if(d < 1 || d > m.getDayCount()){
+            error("illegal day " ++ tostring(day) ++ " in " ++ tostring(m), 2);
+        }
+        this.month = m;
+        this.day = d;
+    }
+
+    getLunarMonth = function(){
+        return owner.month;
+    }
+
+    getYear = function(){
+        return owner.month.getYear();
+    }
+
+    getMonth = function(){
+        return owner.month.getMonthWithLeap();
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    getName = function(){
+        return self.NAMES[owner.day];
+    }
+
+    toString = function(){
+        return tostring(owner.month) ++ owner.getName();
+    }
+
+    next = function(n){
+        return owner.getSolarDay().next(n).getLunarDay();
+    }
+
+    isBefore = function(target){
+        var aYear = owner.getYear();
+        var bYear = target.getYear();
+        if(aYear !== bYear){
+            return aYear < bYear;
+        }
+        var aMonth = owner.getMonth();
+        var bMonth = target.getMonth();
+        if(aMonth !== bMonth){
+            return ..math.abs(aMonth) < ..math.abs(bMonth);
+        }
+        return owner.day < target.getDay();
+    }
+
+    isAfter = function(target){
+        var aYear = owner.getYear();
+        var bYear = target.getYear();
+        if(aYear !== bYear){
+            return aYear > bYear;
+        }
+        var aMonth = owner.getMonth();
+        var bMonth = target.getMonth();
+        if(aMonth != bMonth){
+            return ..math.abs(aMonth) >= ..math.abs(bMonth);
+        }
+        return owner.day > target.getDay();
+    }
+
+    getWeek = function(){
+        return owner.getSolarDay().getWeek();
+    }
+
+    getSixtyCycle = function(){
+        // 从初一的儒略日偏移计算干支
+        var offset = ..math.modf(owner.month.getFirstJulianDay().next(owner.day - 12).getDay());
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(offset, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(offset, 12) + 1).getName()
+        );
+    }
+
+    getDuty = function(){
+        return owner.getSixtyCycleDay().getDuty();
+    }
+
+    getTwelveStar = function(){
+        return owner.getSixtyCycleDay().getTwelveStar();
+    }
+
+    getNineStar = function(){
+        import time.tyme.SolarDay;
+        import time.tyme.SolarTerm;
+
+        var d = owner.getSolarDay();
+        var dongZhi = ..time.tyme.SolarTerm.fromIndex(d.getYear(), 1); // 冬至
+        var dongZhiSolar = dongZhi.getSolarDay();
+        var xiaZhiSolar = dongZhi.next(12).getSolarDay();
+        var dongZhiSolar2 = dongZhi.next(24).getSolarDay();
+        var dongZhiIndex = dongZhiSolar.getLunarDay().getSixtyCycle().index;
+        var xiaZhiIndex = xiaZhiSolar.getLunarDay().getSixtyCycle().index;
+        var dongZhiIndex2 = dongZhiSolar2.getLunarDay().getSixtyCycle().index;
+        var solarShunBai = dongZhiSolar.next(dongZhiIndex > 29 ? 60 - dongZhiIndex : -dongZhiIndex);
+        var solarShunBai2 = dongZhiSolar2.next(dongZhiIndex2 > 29 ? 60 - dongZhiIndex2 : -dongZhiIndex2);
+        var solarNiZi = xiaZhiSolar.next(xiaZhiIndex > 29 ? 60 - xiaZhiIndex : -xiaZhiIndex);
+        var offset = 0;
+        if(!d.isBefore(solarShunBai) && d.isBefore(solarNiZi)){
+            offset = d.subtract(solarShunBai);
+        }
+        elseif(!d.isBefore(solarNiZi) && d.isBefore(solarShunBai2)){
+            offset = 8 - d.subtract(solarNiZi);
+        }
+        elseif(!d.isBefore(solarShunBai2)){
+            offset = d.subtract(solarShunBai2);
+        }
+        elseif(d.isBefore(solarShunBai)){
+            offset = 8 + solarShunBai.subtract(d);
+        }
+        return ..time.tyme.NineStar.fromIndex(..time.tyme.AbstractCulture.indexOf(offset, 9) + 1);
+    }
+
+    getJupiterDirection = function(){
+        var index = owner.getSixtyCycle().index;
+        if(index < 6){
+            return ..time.tyme.Element.fromIndex(..math.modf(index / 12) + 1).getDirection();
+        }
+        return owner.month.getLunarYear().getJupiterDirection();
+    }
+
+    getFetusDay = function(){
+        import time.tyme.fetus;
+        return ..time.tyme.FetusDay.fromLunarDay(owner);
+    }
+
+    getPhaseDay = function(){
+        import time.tyme.Phase;
+        import time.tyme.SolarDay;
+
+        var today = owner.getSolarDay();
+        var m = owner.month.next(1);
+        var p = ..time.tyme.Phase.fromIndex(m.getYear(), m.getMonthWithLeap(), 1);
+        var d = p.getSolarDay();
+        while(d.isAfter(today)){
+            p = p.next(-1);
+            d = p.getSolarDay();
+        }
+        return ..time.tyme.PhaseDay(p, today.subtract(d));
+    }
+
+    getPhase = function(){
+        return owner.getPhaseDay().getPhase();
+    }
+
+    getSolarDay = function(){
+        if(!owner.solarDay){
+            owner.solarDay = owner.month.getFirstJulianDay().next(owner.day - 1).getSolarDay();
+        }
+        return owner.solarDay;
+    }
+
+     getSixtyCycleDay = function(){
+        if(!owner.sixtyCycleDay){
+            import time.tyme.SixtyCycleDay;
+            owner.sixtyCycleDay = ..time.tyme.SixtyCycleDay.fromSolarDay(owner.getSolarDay());
+        }
+        return owner.sixtyCycleDay;
+    }
+
+    getGods = function(){
+        return owner.getSixtyCycleDay().getGods();
+    }
+
+    getRecommends = function(){
+        return owner.getSixtyCycleDay().getRecommends();
+    }
+
+    getAvoids = function(){
+        return owner.getSixtyCycleDay().getAvoids();
+    }
+
+    getTwentyEightStar = function(){
+        // 计算二十八宿
+        var weekIndex = owner.getSolarDay().getWeek().index;
+        var baseStars = [11, 19, 27, 7, 15, 23, 3]; // 1-based 映射
+        var baseIndex = baseStars[weekIndex + 1] - 1; // 转为 0-based
+        var offset = -7 * owner.getSixtyCycle().getEarthBranch().index;
+        return ..time.tyme.TwentyEightStar.fromIndex(..time.tyme.AbstractCulture.indexOf(baseIndex + offset, 28) + 1);
+    }
+
+    getFestival = function(){
+        import time.tyme.festival;
+        return ..time.tyme.LunarFestival.fromYmd(owner.getYear(), owner.getMonth(), owner.day);
+    }
+
+    getSixStar = function(){
+        return ..time.tyme.SixStar.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.month.month + owner.day - 2, 6) + 1);
+    }
+
+    getHours = function(){
+        var l = {};
+        var y = owner.getYear();
+        var m = owner.getMonth();
+        ..table.push(l, LunarHour.fromYmdHms(y, m, owner.day, 0, 0, 0));
+        for(i=0; 24; 2){
+            ..table.push(l, LunarHour.fromYmdHms(y, m, owner.day, i + 1, 0, 0));
+        }
+        return l;
+    }
+
+    getMinorRen = function(){
+        return owner.getLunarMonth().getMinorRen().next(owner.day - 1);
+    }
+
+    getThreePillars = function(){
+        return owner.getSixtyCycleDay().getThreePillars();
+    }
+}
+
+namespace LunarDay {
+    NAMES = [
+        '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+        '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+        '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
+    ];
+
+    fromYmd = function(year, month, day){
+        return LunarDay(year, month, day);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+namespace LunarWeek {
+    NAMES = ['第一周', '第二周', '第三周', '第四周', '第五周', '第六周'];
+
+    fromYm = function(year, month, index, start){
+        return LunarWeek(year, month, index, start);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarHour 农历时 ==========
+class LunarHour {
+    ctor(year, month, day, hour, minute, second){
+        this = ..time.tyme.AbstractTyme();
+        var h = self.numeric(hour, 'hour');
+        if(h < 0 || h > 23){
+            error("illegal hour: " ++ tostring(hour), 2);
+        }
+        var m = self.numeric(minute, 'minute');
+        if(m < 0 || m > 59){
+            error("illegal minute: " ++ tostring(minute), 2);
+        }
+        var s = self.numeric(second, 'second');
+        if(s < 0 || s > 59){
+            error("illegal second: " ++ tostring(second), 2);
+        }
+        this.day = LunarDay.fromYmd(year, month, day);
+        this.hour = h;
+        this.minute = m;
+        this.second = s;
+    }
+
+    getLunarDay = function(){
+        return owner.day;
+    }
+
+    getYear = function(){
+        return owner.day.getYear();
+    }
+
+    getMonth = function(){
+        return owner.day.getMonth();
+    }
+
+    getDay = function(){
+        return owner.day.getDay();
+    }
+
+    getHour = function(){
+        return owner.hour;
+    }
+
+    getMinute = function(){
+        return owner.minute;
+    }
+
+    getSecond = function(){
+        return owner.second;
+    }
+
+    getName = function(){
+        return ..time.tyme.EarthBranch.fromIndex(owner.getIndexInDay()).getName() ++ "时";
+    }
+
+    toString = function(){
+        return tostring(owner.day) ++ owner.getSixtyCycle().getName() ++ "时";
+    }
+
+    getIndexInDay = function(){
+        return ..math.modf((owner.hour + 1) / 2) + 1; // 返回 1-based
+    }
+
+    next = function(n){
+        if(n == 0){
+            return self.fromYmdHms(owner.getYear(), owner.getMonth(), owner.getDay(), owner.hour, owner.minute, owner.second);
+        }
+        var h = owner.hour + n * 2;
+        var diff = h < 0 ? -1 : 1;
+        var hour = ..math.abs(h);
+        var days = ..math.modf(hour / 24) * diff;
+        hour = (hour % 24) * diff;
+        if(hour < 0){
+            hour += 24;
+            days--;
+        }
+        var d = owner.day.next(days);
+        return self.fromYmdHms(d.getYear(), d.getMonth(), d.getDay(), hour, owner.minute, owner.second);
+    }
+
+    isBefore = function(target){
+        if(!owner.day.equals(target.getLunarDay())){
+            return owner.day.isBefore(target.getLunarDay());
+        }
+        if(owner.hour !== target.getHour()){
+            return owner.hour < target.getHour();
+        }
+        return owner.minute !== target.getMinute() ? owner.minute < target.getMinute() : owner.second < target.getSecond();
+    }
+
+    isAfter = function(target){
+        if(!owner.day.equals(target.getLunarDay())){
+            return owner.day.isAfter(target.getLunarDay());
+        }
+        if(owner.hour !== target.getHour()){
+            return owner.hour > target.getHour();
+        }
+        return owner.minute !== target.getMinute() ? owner.minute > target.getMinute() : owner.second > target.getSecond();
+    }
+
+    getSixtyCycle = function(){
+        var earthBranchIndex = (owner.getIndexInDay() - 1) % 12; // 转为 0-based
+        var d = owner.day.getSixtyCycle();
+        if(owner.hour >= 23){
+            d = d.next(1);
+        }
+        var stemIndex = d.getHeavenStem().index % 5 * 2 + earthBranchIndex;
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(earthBranchIndex + 1).getName()
+        );
+    }
+
+    getTwelveStar = function(){
+        var hourBranch = owner.getSixtyCycle().getEarthBranch().index;
+        var dayBranch = owner.getSixtyCycleHour().getDay().getEarthBranch().index;
+        var starIndex = hourBranch + (8 - dayBranch % 6) * 2;
+        return ..time.tyme.TwelveStar.fromIndex(..time.tyme.AbstractCulture.indexOf(starIndex, 12) + 1);
+    }
+
+    getNineStar = function(){
+        import time.tyme.SolarDay;
+        import time.tyme.SolarTerm;
+
+        var solar = owner.day.getSolarDay();
+        var dongZhi = ..time.tyme.SolarTerm.fromIndex(solar.getYear(), 1);
+        var earthBranchIndex = (owner.getIndexInDay() - 1) % 12;
+        var baseStars = [9, 6, 3];
+        var index = baseStars[owner.day.getSixtyCycle().getEarthBranch().index % 3 + 1];
+        if(!solar.isBefore(dongZhi.getJulianDay().getSolarDay()) && solar.isBefore(dongZhi.next(12).getJulianDay().getSolarDay())){
+            index = 8 + earthBranchIndex - index;
+        }
+        else {
+            index -= earthBranchIndex;
+        }
+        return ..time.tyme.NineStar.fromIndex(..time.tyme.AbstractCulture.indexOf(index, 9) + 1);
+    }
+
+    getSolarTime = function(){
+        if(!owner.solarTime){
+            import time.tyme.SolarDay;
+            var d = owner.day.getSolarDay();
+            owner.solarTime = ..time.tyme.SolarTime.fromYmdHms(d.getYear(), d.getMonth(), d.getDay(), owner.hour, owner.minute, owner.second);
+        }
+        return owner.solarTime;
+    }
+
+    getSixtyCycleHour = function(){
+        if(!owner.sixtyCycleHour){
+            import time.tyme.SixtyCycleDay;
+            owner.sixtyCycleHour = ..time.tyme.SixtyCycleHour.fromSolarTime(owner.getSolarTime());
+        }
+        return owner.sixtyCycleHour;
+    }
+
+    getEightChar = function(){
+        return self.provider.getEightChar(owner);
+    }
+
+    getRecommends = function(){
+        import time.tyme.Taboo;
+        return ..time.tyme.Taboo.getHourRecommends(owner.getSixtyCycleHour().getDay(), owner.getSixtyCycle());
+    }
+
+    getAvoids = function(){
+        import time.tyme.Taboo;
+        return ..time.tyme.Taboo.getHourAvoids(owner.getSixtyCycleHour().getDay(), owner.getSixtyCycle());
+    }
+
+    getMinorRen = function(){
+        return owner.getLunarDay().getMinorRen().next(owner.getIndexInDay() - 1);
+    }
+}
+
+namespace LunarHour {
+    provider = null; // 将在 eightchar 模块中设置
+
+    fromYmdHms = function(year, month, day, hour, minute, second){
+        return LunarHour(year, month, day, hour, minute, second);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+LunarYear = 农历年
+LunarYear.fromYear(.(year) = 根据年份创建农历年对象\n参数 @year 为农历年份(-1至9999)\n返回农历年对象
+LunarSeason = 农历季节
+LunarSeason.fromIndex(.(index) = 根据索引创建农历季节对象\n参数 @index 为季节索引(1-12)\n返回农历季节对象
+LunarSeason.fromName(.(name) = 根据名称创建农历季节对象\n参数 @name 为季节名称\n返回农历季节对象
+LunarMonth = 农历月
+LunarMonth.fromYm(.(year,month) = 根据年月创建农历月对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n返回农历月对象
+LunarWeek = 农历周
+LunarWeek.fromYm(.(year,month,index,start) = 根据年月周索引创建农历周对象\n参数 @year 为年份\n参数 @month 为月份\n参数 @index 为周索引(1-6)\n参数 @start 为起始星期(1-7)\n返回农历周对象
+LunarDay = 农历日
+LunarDay.fromYmd(.(year,month,day) = 根据年月日创建农历日对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期(1-30)\n返回农历日对象
+LunarHour = 农历时
+LunarHour.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建农历时对象\n参数 @year 为年份\n参数 @month 为月份(负数表示闰月)\n参数 @day 为日期\n参数 @hour 为小时(0-23)\n参数 @minute 为分钟(0-59)\n参数 @second 为秒(0-59)\n返回农历时对象
+end intellisense**/
+
+/**intellisense(time.tyme.LunarDay)
+fromYmd(.(year,month,day) = 根据年月日创建农历日对象
+next(.(n) = 获取偏移n天的农历日对象
+getLunarMonth() = 获取农历月对象
+getYear() = 获取年份
+getMonth() = 获取月份(负数表示闰月)
+getDay() = 获取日期
+getName() = 获取日期名称
+toString() = 转为字符串
+isBefore(.(target) = 是否早于目标日期
+isAfter(.(target) = 是否晚于目标日期
+getWeek() = 获取星期对象
+getSixtyCycle() = 获取日干支对象
+getDuty() = 获取建除十二值神对象
+getTwelveStar() = 获取黄道黑道十二神对象
+getNineStar() = 获取九星对象
+getJupiterDirection() = 获取岁星方位
+getFetusDay() = 获取胎神日对象
+getPhaseDay() = 获取月相日对象
+getPhase() = 获取月相对象
+getSolarDay() = 获取公历日对象
+getSixtyCycleDay() = 获取干支日对象
+getTwentyEightStar() = 获取二十八宿对象
+getFestival() = 获取农历节日对象(无节日返回null)
+getSixStar() = 获取六曜对象
+getGods() = 获取神煞数组
+getRecommends() = 获取宜事项数组
+getAvoids() = 获取忌事项数组
+getHours() = 获取所有时辰数组
+getMinorRen() = 获取小六壬对象
+getThreePillars() = 获取三柱对象
+end intellisense**/
+
+

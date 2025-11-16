@@ -1,0 +1,680 @@
+﻿//EightChar 八字
+
+import time.tyme.base;
+import time.tyme.HeavenStem;
+ 
+namespace time.tyme;
+
+// ========== ThreePillars 三柱 ==========
+class ThreePillars {
+    ctor(year, month, day){
+        this = ..time.tyme.AbstractCulture();
+        this.year = type(year) == "table" ? year : ..time.tyme.SixtyCycle.fromName(year);
+        this.month = type(month) == "table" ? month : ..time.tyme.SixtyCycle.fromName(month);
+        this.day = type(day) == "table" ? day : ..time.tyme.SixtyCycle.fromName(day);
+    }
+
+    getYear = function(){
+        return owner.year;
+    }
+
+    getMonth = function(){
+        return owner.month;
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    getName = function(){
+        return tostring(owner.year) ++ " " ++ tostring(owner.month) ++ " " ++ tostring(owner.day);
+    }
+
+    getSolarDays = function(startYear, endYear){
+        var l = {};
+        var m = owner.month.getEarthBranch().next(-2).index; // 0-based
+        if(!..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf((owner.year.getHeavenStem().index + 1) * 2 + m, 10) + 1).equals(owner.month.getHeavenStem())){
+            return l;
+        }
+        var y = owner.year.next(-57).index + 1; // 转为实际年份
+        m *= 2;
+        var baseYear = startYear - 1;
+        if(baseYear > y){
+            y += 60 * ..math.modf(..math.ceil((baseYear - y) / 60.0));
+        }
+        while(y <= endYear){
+            import time.tyme.SolarTerm;
+            var term = ..time.tyme.SolarTerm.fromIndex(y, 4); // 立春(1-based)
+            if(m > 0){
+                term = term.next(m);
+            }
+            var solarDay = term.getSolarDay();
+            if(solarDay.getYear() >= startYear){
+                var d = owner.day.next(-solarDay.getLunarDay().getSixtyCycle().index - 1).index; // 计算偏移
+                if(d >= 0){
+                    solarDay = solarDay.next(d);
+                }
+                if(solarDay.getSixtyCycleDay().getThreePillars().equals(owner)){
+                    ..table.push(l, solarDay);
+                }
+            }
+            y += 60;
+        }
+        return l;
+    }
+}
+
+namespace ThreePillars {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== EightChar 八字 ==========
+class EightChar {
+    ctor(year, month, day, hour){
+        this = ..time.tyme.AbstractCulture();
+        this.threePillars = ThreePillars(year, month, day);
+        this.hour = type(hour) == "table" ? hour : ..time.tyme.SixtyCycle.fromName(hour);
+    }
+
+    getYear = function(){
+        return owner.threePillars.getYear();
+    }
+
+    getMonth = function(){
+        return owner.threePillars.getMonth();
+    }
+
+    getDay = function(){
+        return owner.threePillars.getDay();
+    }
+
+    getHour = function(){
+        return owner.hour;
+    }
+
+    getFetalOrigin = function(){
+        var m = owner.getMonth();
+        return ..time.tyme.SixtyCycle.fromName(m.getHeavenStem().next(1).getName() ++ m.getEarthBranch().next(3).getName());
+    }
+
+    getFetalBreath = function(){
+        var d = owner.getDay();
+        var stemIndex = d.getHeavenStem().index + 5; // 0-based
+        var branchIndex = 13 - d.getEarthBranch().index; // 0-based
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(branchIndex, 12) + 1).getName()
+        );
+    }
+
+    getOwnSign = function(){
+        var m = owner.getMonth().getEarthBranch().index - 1;
+        if(m < 1){
+            m += 12;
+        }
+        var h = owner.hour.getEarthBranch().index - 1;
+        if(h < 1){
+            h += 12;
+        }
+        var offset = m + h;
+        offset = (offset >= 14 ? 26 : 14) - offset;
+        var stemIndex = (owner.getYear().getHeavenStem().index + 1) * 2 + offset - 1;
+        var branchIndex = offset + 1;
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(branchIndex, 12) + 1).getName()
+        );
+    }
+
+    getBodySign = function(){
+        var offset = owner.getMonth().getEarthBranch().index - 1;
+        if(offset < 1){
+            offset += 12;
+        }
+        offset += owner.hour.getEarthBranch().index + 1;
+        if(offset > 12){
+            offset -= 12;
+        }
+        var stemIndex = (owner.getYear().getHeavenStem().index + 1) * 2 + offset - 1;
+        var branchIndex = offset + 1;
+        return ..time.tyme.SixtyCycle.fromName(
+            ..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf(stemIndex, 10) + 1).getName()
+            ++ ..time.tyme.EarthBranch.fromIndex(..time.tyme.AbstractCulture.indexOf(branchIndex, 12) + 1).getName()
+        );
+    }
+
+    getName = function(){
+        return tostring(owner.threePillars) ++ " " ++ tostring(owner.hour);
+    }
+
+    getSolarTimes = function(startYear, endYear){
+        var l = {};
+        var year = owner.getYear();
+        var month = owner.getMonth();
+        var day = owner.getDay();
+        var m = month.getEarthBranch().next(-2).index; // 0-based
+        if(!..time.tyme.HeavenStem.fromIndex(..time.tyme.AbstractCulture.indexOf((year.getHeavenStem().index + 1) * 2 + m, 10) + 1).equals(month.getHeavenStem())){
+            return l;
+        }
+        var y = year.next(-57).index + 1;
+        m *= 2;
+        var h = owner.hour.getEarthBranch().index * 2;
+        var hours = h == 0 ? [0, 23] : [h];
+        var baseYear = startYear - 1;
+        if(baseYear > y){
+            y += 60 * ..math.modf(..math.ceil((baseYear - y) / 60.0));
+        }
+        while(y <= endYear){
+            import time.tyme.SolarTerm;
+            import time.tyme.SolarDay;
+
+            var term = ..time.tyme.SolarTerm.fromIndex(y, 4); // 立春
+            if(m > 0){
+                term = term.next(m);
+            }
+            var solarTime = term.getJulianDay().getSolarTime();
+            if(solarTime.getYear() >= startYear){
+                var solarDay = solarTime.getSolarDay();
+                var d = day.next(-solarDay.getLunarDay().getSixtyCycle().index - 1).index;
+                if(d >= 0){
+                    solarDay = solarDay.next(d);
+                }
+                for(i=1; #hours){
+                    var mi = 0;
+                    var s = 0;
+                    var hour = hours[i];
+                    if(d == 0 && hour == solarTime.getHour()){
+                        mi = solarTime.getMinute();
+                        s = solarTime.getSecond();
+                    }
+                    var time = ..time.tyme.SolarTime.fromYmdHms(solarDay.getYear(), solarDay.getMonth(), solarDay.getDay(), hour, mi, s);
+                    if(d == 30){
+                        time = time.next(-3600);
+                    }
+                    if(time.getLunarHour().getEightChar().equals(owner)){
+                        ..table.push(l, time);
+                    }
+                }
+            }
+            y += 60;
+        }
+        return l;
+    }
+}
+
+namespace EightChar {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== 八字提供者接口 ==========
+class DefaultEightCharProvider {
+    ctor(){
+        this = ..time.tyme.AbstractCulture();
+    }
+
+    getEightChar = function(hour){
+        return hour.getSixtyCycleHour().getEightChar();
+    }
+}
+
+namespace DefaultEightCharProvider {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+class LunarSect2EightCharProvider {
+    ctor(){
+        this = ..time.tyme.AbstractCulture();
+    }
+
+    getEightChar = function(hour){
+        var h = hour.getSixtyCycleHour();
+        return EightChar(h.getYear(), h.getMonth(), hour.getLunarDay().getSixtyCycle(), h.getSixtyCycle());
+    }
+}
+
+namespace LunarSect2EightCharProvider {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// 设置默认八字提供者
+import time.tyme.LunarDay;
+..time.tyme.LunarHour.provider = DefaultEightCharProvider();
+
+// ========== ChildLimitInfo 童限信息 ==========
+class ChildLimitInfo {
+    ctor(startTime, endTime, yearCount, monthCount, dayCount, hourCount, minuteCount){
+        this = ..time.tyme.AbstractCulture();
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.yearCount = yearCount;
+        this.monthCount = monthCount;
+        this.dayCount = dayCount;
+        this.hourCount = hourCount;
+        this.minuteCount = minuteCount;
+    }
+
+    getStartTime = function(){
+        return owner.startTime;
+    }
+
+    getEndTime = function(){
+        return owner.endTime;
+    }
+
+    getYearCount = function(){
+        return owner.yearCount;
+    }
+
+    getMonthCount = function(){
+        return owner.monthCount;
+    }
+
+    getDayCount = function(){
+        return owner.dayCount;
+    }
+
+    getHourCount = function(){
+        return owner.hourCount;
+    }
+
+    getMinuteCount = function(){
+        return owner.minuteCount;
+    }
+
+    getName = function(){
+        return tostring(owner.yearCount) ++ "年" ++ tostring(owner.monthCount) ++ "月" ++ tostring(owner.dayCount) ++ "日" ++ tostring(owner.hourCount) ++ "时" ++ tostring(owner.minuteCount) ++ "分";
+    }
+}
+
+namespace ChildLimitInfo {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== 童限提供者基类 ==========
+class AbstractChildLimitProvider {
+    ctor(){
+        this = ..time.tyme.AbstractCulture();
+    }
+
+    next = function(birthTime, addYear, addMonth, addDay, addHour, addMinute, addSecond){
+        import time.tyme.SolarDay;
+
+        var d = birthTime.getDay() + addDay;
+        var h = birthTime.getHour() + addHour;
+        var mi = birthTime.getMinute() + addMinute;
+        var s = birthTime.getSecond() + addSecond;
+        mi += ..math.modf(s / 60);
+        s %= 60;
+        h += ..math.modf(mi / 60);
+        mi %= 60;
+        d += ..math.modf(h / 24);
+        h %= 24;
+
+        var sm = ..time.tyme.SolarMonth.fromYm(birthTime.getYear() + addYear, birthTime.getMonth()).next(addMonth);
+
+        var dc = sm.getDayCount();
+        while(d > dc){
+            d -= dc;
+            sm = sm.next(1);
+            dc = sm.getDayCount();
+        }
+
+        return ChildLimitInfo(birthTime, ..time.tyme.SolarTime.fromYmdHms(sm.getYear(), sm.getMonth(), d, h, mi, s), addYear, addMonth, addDay, addHour, addMinute);
+    }
+
+    getInfo = function(birthTime, term){
+        error("abstract method", 2);
+    }
+}
+
+var AbstractChildLimitProvider = AbstractChildLimitProvider;
+namespace AbstractChildLimitProvider {
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== DefaultChildLimitProvider 默认童限提供者 ==========
+class DefaultChildLimitProvider {
+    ctor(){
+        this = AbstractChildLimitProvider();
+    }
+
+    getInfo = function(birthTime, term){
+        var seconds = ..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime));
+        var year = ..math.modf(seconds / 259200);
+        seconds %= 259200;
+        var month = ..math.modf(seconds / 21600);
+        seconds %= 21600;
+        var day = ..math.modf(seconds / 720);
+        seconds %= 720;
+        var hour = ..math.modf(seconds / 30);
+        seconds %= 30;
+        var minute = seconds * 2;
+
+        return owner.next(birthTime, year, month, day, hour, minute, 0);
+    }
+}
+
+var DefaultChildLimitProvider = DefaultChildLimitProvider;
+namespace DefaultChildLimitProvider {
+    indexOf = AbstractChildLimitProvider.indexOf;
+    numeric = AbstractChildLimitProvider.numeric;
+}
+
+// ========== China95ChildLimitProvider 95派童限提供者 ==========
+class China95ChildLimitProvider {
+    ctor(){
+        this = AbstractChildLimitProvider();
+    }
+
+    getInfo = function(birthTime, term){
+        var minutes = ..math.modf(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
+        var year = ..math.modf(minutes / 4320);
+        minutes %= 4320;
+        var month = ..math.modf(minutes / 360);
+        minutes %= 360;
+        var day = ..math.modf(minutes / 12);
+        return owner.next(birthTime, year, month, day, 0, 0, 0);
+    }
+}
+
+namespace China95ChildLimitProvider {
+    indexOf = AbstractChildLimitProvider.indexOf;
+    numeric = AbstractChildLimitProvider.numeric;
+}
+
+// ========== LunarSect1ChildLimitProvider 农历派1童限提供者 ==========
+class LunarSect1ChildLimitProvider {
+    ctor(){
+        this = AbstractChildLimitProvider();
+    }
+
+    getInfo = function(birthTime, term){
+        var termTime = term.getJulianDay().getSolarTime();
+        var $end = termTime;
+        var start = birthTime;
+        if(birthTime.isAfter(termTime)){
+            $end = birthTime;
+            start = termTime;
+        }
+        var endTimeZhiIndex = ($end.getHour() == 23) ? 11 : $end.getLunarHour().getIndexInDay() - 1; // 转为 0-based
+        var startTimeZhiIndex = (start.getHour() == 23) ? 11 : start.getLunarHour().getIndexInDay() - 1;
+        var hourDiff = endTimeZhiIndex - startTimeZhiIndex;
+        var dayDiff = $end.getSolarDay().subtract(start.getSolarDay());
+        if(hourDiff < 0){
+            hourDiff += 12;
+            dayDiff--;
+        }
+        var monthDiff = ..math.modf(hourDiff * 10 / 30);
+        var month = dayDiff * 4 + monthDiff;
+        var day = hourDiff * 10 - monthDiff * 30;
+        var year = ..math.modf(month / 12);
+        month = month - year * 12;
+        return owner.next(birthTime, year, month, day, 0, 0, 0);
+    }
+}
+
+namespace LunarSect1ChildLimitProvider {
+    indexOf = AbstractChildLimitProvider.indexOf;
+    numeric = AbstractChildLimitProvider.numeric;
+}
+
+// ========== LunarSect2ChildLimitProvider 农历派2童限提供者 ==========
+class LunarSect2ChildLimitProvider {
+    ctor(){
+        this = AbstractChildLimitProvider();
+    }
+
+    getInfo = function(birthTime, term){
+        var minutes = ..math.modf(..math.abs(term.getJulianDay().getSolarTime().subtract(birthTime)) / 60);
+        var year = ..math.modf(minutes / 4320);
+        minutes %= 4320;
+        var month = ..math.modf(minutes / 360);
+        minutes %= 360;
+        var day = ..math.modf(minutes / 12);
+        minutes %= 12;
+        var hour = minutes * 2;
+        return owner.next(birthTime, year, month, day, hour, 0, 0);
+    }
+}
+
+namespace LunarSect2ChildLimitProvider {
+    indexOf = AbstractChildLimitProvider.indexOf;
+    numeric = AbstractChildLimitProvider.numeric;
+}
+
+// ========== ChildLimit 童限 ==========
+class ChildLimit {
+    ctor(birthTime, gender){
+        this = ..time.tyme.AbstractCulture();
+        this.gender = gender;
+        this.eightChar = birthTime.getLunarHour().getEightChar();
+        var yang = ..time.tyme.YinYang.YANG == this.eightChar.getYear().getHeavenStem().getYinYang();
+        var man = ..time.tyme.Gender.MAN == gender;
+        this.forward = (yang && man) || (!yang && !man);
+
+        import time.tyme.SolarTerm;
+        var term = birthTime.getTerm();
+        if(!term.isJie()){
+            term = term.next(-1);
+        }
+        if(this.forward){
+            term = term.next(2);
+        }
+        this.info = self.provider.getInfo(birthTime, term);
+    }
+
+    getEightChar = function(){
+        return owner.eightChar;
+    }
+
+    getGender = function(){
+        return owner.gender;
+    }
+
+    getYearCount = function(){
+        return owner.info.getYearCount();
+    }
+
+    getMonthCount = function(){
+        return owner.info.getMonthCount();
+    }
+
+    getDayCount = function(){
+        return owner.info.getDayCount();
+    }
+
+    getHourCount = function(){
+        return owner.info.getHourCount();
+    }
+
+    getMinuteCount = function(){
+        return owner.info.getMinuteCount();
+    }
+
+    getStartTime = function(){
+        return owner.info.getStartTime();
+    }
+
+    getEndTime = function(){
+        return owner.info.getEndTime();
+    }
+
+    isForward = function(){
+        return owner.forward;
+    }
+
+    getStartDecadeFortune = function(){
+        return DecadeFortune.fromChildLimit(owner, 1); // 1-based
+    }
+
+    getDecadeFortune = function(){
+        return DecadeFortune.fromChildLimit(owner, 0);
+    }
+
+    getStartFortune = function(){
+        return Fortune.fromChildLimit(owner, 1); // 1-based
+    }
+
+    getStartSixtyCycleYear = function(){
+        import time.tyme.SixtyCycleDay;
+        return ..time.tyme.SixtyCycleYear.fromYear(owner.getStartTime().getYear());
+    }
+
+    getEndSixtyCycleYear = function(){
+        import time.tyme.SixtyCycleDay;
+        return ..time.tyme.SixtyCycleYear.fromYear(owner.getEndTime().getYear());
+    }
+
+    getStartAge = function(){
+        return 1;
+    }
+
+    getEndAge = function(){
+        var n = owner.getEndSixtyCycleYear().getYear() - owner.getStartSixtyCycleYear().getYear();
+        return ..math.max(n, 1);
+    }
+
+    getName = function(){
+        return owner.info.getName();
+    }
+}
+
+namespace ChildLimit {
+    provider = DefaultChildLimitProvider();
+
+    fromSolarTime = function(birthTime, gender){
+        return ChildLimit(birthTime, gender);
+    }
+
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== DecadeFortune 大运 ==========
+class DecadeFortune {
+    ctor(childLimit, index){
+        this = ..time.tyme.AbstractTyme();
+        this.childLimit = childLimit;
+        this.index = index - 1; // 内部 0-based
+    }
+
+    getStartAge = function(){
+        return owner.childLimit.getEndSixtyCycleYear().getYear() - owner.childLimit.getStartSixtyCycleYear().getYear() + 1 + owner.index * 10;
+    }
+
+    getEndAge = function(){
+        return owner.getStartAge() + 9;
+    }
+
+    getStartSixtyCycleYear = function(){
+        return owner.childLimit.getEndSixtyCycleYear().next(owner.index * 10);
+    }
+
+    getEndSixtyCycleYear = function(){
+        return owner.getStartSixtyCycleYear().next(9);
+    }
+
+    getSixtyCycle = function(){
+        return owner.childLimit.getEightChar().getMonth().next(owner.childLimit.isForward() ? owner.index + 1 : -owner.index - 1);
+    }
+
+    getName = function(){
+        return owner.getSixtyCycle().getName();
+    }
+
+    next = function(n){
+        return self.fromChildLimit(owner.childLimit, owner.index + n + 1); // 转为 1-based
+    }
+
+    getStartFortune = function(){
+        return Fortune.fromChildLimit(owner.childLimit, owner.index * 10 + 1); // 转为 1-based
+    }
+}
+
+namespace DecadeFortune {
+    fromChildLimit = function(childLimit, index){
+        return DecadeFortune(childLimit, index);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== Fortune 流年 ==========
+class Fortune {
+    ctor(childLimit, index){
+        this = ..time.tyme.AbstractTyme();
+        this.childLimit = childLimit;
+        this.index = index - 1; // 内部 0-based
+    }
+
+    getAge = function(){
+        return owner.childLimit.getEndSixtyCycleYear().getYear() - owner.childLimit.getStartSixtyCycleYear().getYear() + 1 + owner.index;
+    }
+
+    getSixtyCycleYear = function(){
+        return owner.childLimit.getEndSixtyCycleYear().next(owner.index);
+    }
+
+    getSixtyCycle = function(){
+        var n = owner.getAge();
+        return owner.childLimit.getEightChar().getHour().next(owner.childLimit.isForward() ? n : -n);
+    }
+
+    getName = function(){
+        return owner.getSixtyCycle().getName();
+    }
+
+    next = function(n){
+        return self.fromChildLimit(owner.childLimit, owner.index + n + 1); // 转为 1-based
+    }
+}
+
+namespace Fortune {
+    fromChildLimit = function(childLimit, index){
+        return Fortune(childLimit, index);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+ThreePillars = 三柱(年月日)
+EightChar = 八字
+DefaultEightCharProvider = 默认八字提供者
+LunarSect2EightCharProvider = 农历派2八字提供者
+ChildLimitInfo = 童限信息
+AbstractChildLimitProvider = 抽象童限提供者
+DefaultChildLimitProvider = 默认童限提供者
+China95ChildLimitProvider = 95派童限提供者
+LunarSect1ChildLimitProvider = 农历派1童限提供者
+LunarSect2ChildLimitProvider = 农历派2童限提供者
+ChildLimit = 童限
+ChildLimit.fromSolarTime(.(birthTime,gender) = 根据出生时间和性别创建童限对象\n参数 @birthTime 为出生时间对象\n参数 @gender 为性别(Gender.MAN或Gender.WOMAN)\n返回童限对象
+ChildLimit.provider = 童限提供者，默认为DefaultChildLimitProvider
+DecadeFortune = 大运
+DecadeFortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建大运对象\n参数 @childLimit 为童限对象\n参数 @index 为大运索引(1-based)\n返回大运对象
+Fortune = 流年
+Fortune.fromChildLimit(.(childLimit,index) = 根据童限和索引创建流年对象\n参数 @childLimit 为童限对象\n参数 @index 为流年索引(1-based)\n返回流年对象
+end intellisense**/
+
+/**intellisense(time.tyme.EightChar)
+getYear() = 获取年柱干支对象
+getMonth() = 获取月柱干支对象
+getDay() = 获取日柱干支对象
+getHour() = 获取时柱干支对象
+getFetalOrigin() = 获取胎元干支对象
+getFetalBreath() = 获取胎息干支对象
+getOwnSign() = 获取命宫干支对象
+getBodySign() = 获取身宫干支对象
+getName() = 获取八字字符串
+getSolarTimes(.(startYear,endYear) = 获取指定年份范围内的公历时间数组\n参数 @startYear 为起始年份\n参数 @endYear 为结束年份\n返回公历时间对象数组
+toString() = 转为字符串
+end intellisense**/

@@ -1,0 +1,119 @@
+﻿//Phenology 物候
+import time.tyme.base;
+import time.tyme.JulianDay;
+import time.tyme.ShouXingUtil;
+
+namespace time.tyme;
+
+// ========== Phenology 物候 ==========
+class Phenology {
+    ctor(year, indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+        if(type(indexOrName) == "number"){
+            var size = this.getSize();
+            // indexOrName 是 1-based，需要减 1
+            this.year = ..math.modf((year * size + (indexOrName - 1)) / size);
+        }
+        else {
+            this.year = year;
+        }
+    }
+
+    next = function(n){
+        var size = owner.getSize();
+        var i = owner.index + n;
+        var newYear = ..math.modf((owner.year * size + i) / size);
+        return self.fromIndex(newYear, ..time.tyme.AbstractCulture.indexOf(i, size) + 1);
+    }
+
+    getYear = function(){
+        return owner.year;
+    }
+
+    getThreePhenology = function(){
+        return ThreePhenology.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.index, 3) + 1);
+    }
+
+    getJulianDay = function(){
+        var t = ..time.tyme.ShouXingUtil.saLonT((owner.year - 2000 + owner.index * 5.0 / 360 + 1) * 2 * ..math.pi);
+        return ..time.tyme.JulianDay.fromJulianDay(t * 36525 + ..time.tyme.JulianDay.J2000 + 8.0 / 24 - ..time.tyme.ShouXingUtil.dtT(t * 36525));
+    }
+}
+
+namespace Phenology {
+    NAMES = [
+        '蚯蚓结', '麋角解', '水泉动', '雁北乡', '鹊始巢', '雉始雊', '鸡始乳', '征鸟厉疾',
+        '水泽腹坚', '东风解冻', '蛰虫始振', '鱼陟负冰', '獭祭鱼', '候雁北', '草木萌动',
+        '桃始华', '仓庚鸣', '鹰化为鸠', '玄鸟至', '雷乃发声', '始电', '桐始华', '田鼠化为鴽',
+        '虹始见', '萍始生', '鸣鸠拂其羽', '戴胜降于桑', '蝼蝈鸣', '蚯蚓出', '王瓜生',
+        '苦菜秀', '靡草死', '麦秋至', '螳螂生', '鵙始鸣', '反舌无声', '鹿角解', '蜩始鸣',
+        '半夏生', '温风至', '蟋蟀居壁', '鹰始挚', '腐草为萤', '土润溽暑', '大雨行时',
+        '凉风至', '白露降', '寒蝉鸣', '鹰乃祭鸟', '天地始肃', '禾乃登', '鸿雁来', '玄鸟归',
+        '群鸟养羞', '雷始收声', '蛰虫坯户', '水始涸', '鸿雁来宾', '雀入大水为蛤', '菊有黄花',
+        '豺乃祭兽', '草木黄落', '蛰虫咸俯', '水始冰', '地始冻', '雉入大水为蜃', '虹藏不见',
+        '天气上升地气下降', '闭塞而成冬', '鹖鴠不鸣', '虎始交', '荔挺出'
+    ];
+
+    fromIndex = function(year, index){
+        return Phenology(year, self.numeric(index, 'phenology index'));
+    }
+
+    fromName = function(year, name){
+        return Phenology(year, name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== ThreePhenology 三候 ==========
+class ThreePhenology {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace ThreePhenology {
+    NAMES = ['初候', '二候', '三候'];
+
+    fromIndex = function(index){
+        return ThreePhenology(self.numeric(index, 'three phenology index'));
+    }
+
+    fromName = function(name){
+        return ThreePhenology(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== PhenologyDay 物候日 ==========
+class PhenologyDay {
+    ctor(phenology, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(phenology, dayIndex);
+    }
+
+    getPhenology = function(){
+        return owner.culture;
+    }
+}
+
+namespace PhenologyDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+Phenology = 物候
+Phenology.fromIndex(.(year,index) = 根据年份和索引创建物候对象\n参数 @year 为年份\n参数 @index 为物候索引(1-72)\n返回物候对象
+Phenology.fromName(.(year,name) = 根据年份和名称创建物候对象\n参数 @year 为年份\n参数 @name 为物候名称\n返回物候对象
+ThreePhenology = 三候
+ThreePhenology.fromIndex(.(index) = 根据索引创建三候对象\n参数 @index 为三候索引(1-3)\n返回三候对象
+ThreePhenology.fromName(.(name) = 根据名称创建三候对象\n参数 @name 为三候名称\n返回三候对象
+PhenologyDay = 物候日
+end intellisense**/

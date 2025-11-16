@@ -1,0 +1,58 @@
+﻿//PlumRain 梅雨
+import time.tyme.base;
+
+namespace time.tyme;
+
+// ========== PlumRain 梅雨 ==========
+class PlumRain {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace PlumRain {
+    NAMES = ['入梅', '出梅'];
+
+    fromIndex = function(index){
+        return PlumRain(self.numeric(index, 'plum rain index'));
+    }
+
+    fromName = function(name){
+        return PlumRain(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== PlumRainDay 梅雨日 ==========
+class PlumRainDay {
+    ctor(plumRain, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(plumRain, dayIndex);
+    }
+
+    getPlumRain = function(){
+        return owner.culture;
+    }
+
+    toString = function(){
+        // 出梅只显示名称，不显示天数
+        return owner.getPlumRain().index == 0 ? ..time.tyme.AbstractCultureDay.toString.call(owner) : owner.culture.getName();
+    }
+}
+
+namespace PlumRainDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+PlumRain = 梅雨
+PlumRain.fromIndex(.(index) = 根据索引创建梅雨对象\n参数 @index 为索引值(1-2)\n返回梅雨对象
+PlumRain.fromName(.(name) = 根据名称创建梅雨对象\n参数 @name 为梅雨名称\n返回梅雨对象
+PlumRainDay = 梅雨日
+end intellisense**/

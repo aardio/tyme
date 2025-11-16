@@ -1,0 +1,473 @@
+﻿//star 星宿
+
+import time.tyme.base;
+import time.tyme.Element;
+
+namespace time.tyme.star{};
+namespace time.tyme;
+
+// ========== Week 星期 ==========
+class Week {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getSevenStar = function(){
+        return SevenStar.fromIndex(owner.getIndex());
+    }
+}
+
+namespace Week {
+    NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+
+    fromIndex = function(index){
+        return Week(self.numeric(index, 'week index'));
+    }
+
+    fromName = function(name){
+        return Week(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== SevenStar 七曜 ==========
+class SevenStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getWeek = function(){
+        return Week.fromIndex(owner.getIndex());
+    }
+}
+
+namespace SevenStar {
+    NAMES = ['日', '月', '火', '水', '木', '金', '土'];
+
+    fromIndex = function(index){
+        return SevenStar(self.numeric(index, 'seven star index'));
+    }
+
+    fromName = function(name){
+        return SevenStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Animal 二十八宿动物 ==========
+class Animal {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getTwentyEightStar = function(){
+        return TwentyEightStar.fromIndex(owner.getIndex());
+    }
+}
+
+namespace Animal {
+    NAMES = [
+        '蛟', '龙', '貉', '兔', '狐', '虎', '豹', '獬',
+        '牛', '蝠', '鼠', '燕', '猪', '獝', '狼', '狗',
+        '彘', '鸡', '乌', '猴', '猿', '犴', '羊', '獐',
+        '马', '鹿', '蛇', '蚓'
+    ];
+
+    fromIndex = function(index){
+        return Animal(self.numeric(index, 'animal index'));
+    }
+
+    fromName = function(name){
+        return Animal(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== TwentyEightStar 二十八宿 ==========
+class TwentyEightStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getSevenStar = function(){
+        // 注意：原算法是 index % 7 + 4，这里需要转换
+        return SevenStar.fromIndex(..time.tyme.AbstractCulture.indexOf(owner.index + 4, 7) + 1);
+    }
+
+    getLand = function(){
+        // 映射表：1-based 数据
+        var lands = [5,5,5,3,3,3,8,8,8,1,1,1,1,6,6,6,7,7,7,2,2,2,9,9,9,4,4,4];
+        return ..time.tyme.Land.fromIndex(lands[owner.index + 1]);
+    }
+
+    getZone = function(){
+        return ..time.tyme.Zone.fromIndex(..math.modf(owner.index / 7) + 1);
+    }
+
+    getAnimal = function(){
+        return Animal.fromIndex(owner.getIndex());
+    }
+
+    getLuck = function(){
+        var lucks = [1,2,2,1,2,1,1,1,2,2,2,2,1,1,2,1,1,2,1,2,1,1,2,2,2,1,2,1];
+        return Luck.fromIndex(lucks[owner.index + 1]);
+    }
+}
+
+namespace TwentyEightStar {
+    NAMES = [
+        '角', '亢', '氐', '房', '心', '尾', '箕',
+        '斗', '牛', '女', '虚', '危', '室', '壁',
+        '奎', '娄', '胃', '昴', '毕', '觜', '参',
+        '井', '鬼', '柳', '星', '张', '翼', '轸'
+    ];
+
+    fromIndex = function(index){
+        return TwentyEightStar(self.numeric(index, 'twenty eight star index'));
+    }
+
+    fromName = function(name){
+        return TwentyEightStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Luck 吉凶 ==========
+class Luck {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Luck {
+    NAMES = ['吉', '凶'];
+
+    fromIndex = function(index){
+        return Luck(self.numeric(index, 'luck index'));
+    }
+
+    fromName = function(name){
+        return Luck(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== NineStar 九星 ==========
+class NineStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getColor = function(){
+        var colors = ['白', '黑', '碧', '绿', '黄', '白', '赤', '白', '紫'];
+        return colors[owner.index + 1];
+    }
+
+    getElement = function(){
+        var elements = [5,3,1,1,3,4,4,3,2]; // 水土木木土金金土火
+        return ..time.tyme.Element.fromIndex(elements[owner.index + 1]);
+    }
+
+    getDipper = function(){
+        return Dipper.fromIndex(owner.getIndex());
+    }
+
+    getDirection = function(){
+        return ..time.tyme.Direction.fromIndex(owner.getIndex());
+    }
+
+    toString = function(){
+        return owner.getName() ++ owner.getColor() ++ tostring(owner.getElement());
+    }
+}
+
+namespace NineStar {
+    NAMES = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
+
+    fromIndex = function(index){
+        return NineStar(self.numeric(index, 'nine star index'));
+    }
+
+    fromName = function(name){
+        return NineStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Dipper 北斗九星 ==========
+class Dipper {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Dipper {
+    NAMES = ['天枢', '天璇', '天玑', '天权', '玉衡', '开阳', '摇光', '洞明', '隐元'];
+
+    fromIndex = function(index){
+        return Dipper(self.numeric(index, 'dipper index'));
+    }
+
+    fromName = function(name){
+        return Dipper(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== TwelveStar 黄道黑道十二神 ==========
+class TwelveStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getEcliptic = function(){
+        var ecliptics = [1,1,2,2,1,1,2,1,2,2,1,2]; // 黄道黑道
+        return Ecliptic.fromIndex(ecliptics[owner.index + 1]);
+    }
+}
+
+namespace TwelveStar {
+    NAMES = ['青龙', '明堂', '天刑', '朱雀', '金匮', '天德', '白虎', '玉堂', '天牢', '玄武', '司命', '勾陈'];
+
+    fromIndex = function(index){
+        return TwelveStar(self.numeric(index, 'twelve star index'));
+    }
+
+    fromName = function(name){
+        return TwelveStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Ecliptic 黄道黑道 ==========
+class Ecliptic {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getLuck = function(){
+        return Luck.fromIndex(owner.getIndex());
+    }
+}
+
+namespace Ecliptic {
+    NAMES = ['黄道', '黑道'];
+
+    fromIndex = function(index){
+        return Ecliptic(self.numeric(index, 'ecliptic index'));
+    }
+
+    fromName = function(name){
+        return Ecliptic(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== SixStar 六曜 ==========
+class SixStar {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace SixStar {
+    NAMES = ['先胜', '友引', '先负', '佛灭', '大安', '赤口'];
+
+    fromIndex = function(index){
+        return SixStar(self.numeric(index, 'six star index'));
+    }
+
+    fromName = function(name){
+        return SixStar(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== MinorRen 小六壬 ==========
+class MinorRen {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getLuck = function(){
+        return Luck.fromIndex((owner.index % 2) + 1);
+    }
+
+    getElement = function(){
+        var elements = [1,5,2,4,1,3]; // 木水火金木土
+        return ..time.tyme.Element.fromIndex(elements[owner.index + 1]);
+    }
+}
+
+namespace MinorRen {
+    NAMES = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
+
+    fromIndex = function(index){
+        return MinorRen(self.numeric(index, 'minor ren index'));
+    }
+
+    fromName = function(name){
+        return MinorRen(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Constellation 星座 ==========
+class Constellation {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Constellation {
+    NAMES = [
+        '白羊', '金牛', '双子', '巨蟹', '狮子', '处女',
+        '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼'
+    ];
+
+    fromIndex = function(index){
+        return Constellation(self.numeric(index, 'constellation index'));
+    }
+
+    fromName = function(name){
+        return Constellation(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Duty 建除十二值神 ==========
+class Duty {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Duty {
+    NAMES = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭'];
+
+    fromIndex = function(index){
+        return Duty(self.numeric(index, 'duty index'));
+    }
+
+    fromName = function(name){
+        return Duty(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+Week = 星期
+Week.fromIndex(.(index) = 根据索引创建星期对象\n参数 @index 为索引值(1-7)\n返回星期对象
+Week.fromName(.(name) = 根据名称创建星期对象\n参数 @name 为星期名称\n返回星期对象
+SevenStar = 七曜
+SevenStar.fromIndex(.(index) = 根据索引创建七曜对象\n参数 @index 为索引值(1-7)\n返回七曜对象
+SevenStar.fromName(.(name) = 根据名称创建七曜对象\n参数 @name 为七曜名称\n返回七曜对象
+Animal = 二十八宿动物
+Animal.fromIndex(.(index) = 根据索引创建动物对象\n参数 @index 为索引值(1-28)\n返回动物对象
+Animal.fromName(.(name) = 根据名称创建动物对象\n参数 @name 为动物名称\n返回动物对象
+TwentyEightStar = 二十八宿
+TwentyEightStar.fromIndex(.(index) = 根据索引创建二十八宿对象\n参数 @index 为索引值(1-28)\n返回二十八宿对象
+TwentyEightStar.fromName(.(name) = 根据名称创建二十八宿对象\n参数 @name 为宿名\n返回二十八宿对象
+NineStar = 九星
+NineStar.fromIndex(.(index) = 根据索引创建九星对象\n参数 @index 为索引值(1-9)\n返回九星对象
+NineStar.fromName(.(name) = 根据名称创建九星对象\n参数 @name 为九星名称\n返回九星对象
+Dipper = 北斗九星
+Dipper.fromIndex(.(index) = 根据索引创建北斗九星对象\n参数 @index 为索引值(1-9)\n返回北斗九星对象
+Dipper.fromName(.(name) = 根据名称创建北斗九星对象\n参数 @name 为星名\n返回北斗九星对象
+TwelveStar = 黄道黑道十二神
+TwelveStar.fromIndex(.(index) = 根据索引创建十二神对象\n参数 @index 为索引值(1-12)\n返回十二神对象
+TwelveStar.fromName(.(name) = 根据名称创建十二神对象\n参数 @name 为十二神名称\n返回十二神对象
+Ecliptic = 黄道黑道
+Ecliptic.fromIndex(.(index) = 根据索引创建黄道黑道对象\n参数 @index 为索引值(1-2)\n返回黄道黑道对象
+Ecliptic.fromName(.(name) = 根据名称创建黄道黑道对象\n参数 @name 为名称\n返回黄道黑道对象
+SixStar = 六曜
+SixStar.fromIndex(.(index) = 根据索引创建六曜对象\n参数 @index 为索引值(1-6)\n返回六曜对象
+SixStar.fromName(.(name) = 根据名称创建六曜对象\n参数 @name 为六曜名称\n返回六曜对象
+MinorRen = 小六壬
+MinorRen.fromIndex(.(index) = 根据索引创建小六壬对象\n参数 @index 为索引值(1-6)\n返回小六壬对象
+MinorRen.fromName(.(name) = 根据名称创建小六壬对象\n参数 @name 为小六壬名称\n返回小六壬对象
+Duty = 建除十二值神
+Duty.fromIndex(.(index) = 根据索引创建值神对象\n参数 @index 为索引值(1-12)\n返回值神对象
+Duty.fromName(.(name) = 根据名称创建值神对象\n参数 @name 为值神名称\n返回值神对象
+Constellation = 星座
+Constellation.fromIndex(.(index) = 根据索引创建星座对象\n参数 @index 为索引值(1-12)\n返回星座对象
+Constellation.fromName(.(name) = 根据名称创建星座对象\n参数 @name 为星座名称\n返回星座对象
+end intellisense**/

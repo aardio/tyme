@@ -1,0 +1,114 @@
+﻿//JulianDay 儒略日
+import time.tyme.base;
+import time.tyme.data;
+
+namespace time.tyme;
+
+class JulianDay {
+    ctor(day){
+        this = ..time.tyme.AbstractTyme();
+        this.day = self.numeric(day, 'julian day');
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    getName = function(){
+        return tostring(owner.day);
+    }
+
+    next = function(n){
+        return self.fromJulianDay(owner.day + n);
+    }
+
+    getSolarDay = function(){
+        return owner.getSolarTime().getSolarDay();
+    }
+
+    getSolarTime = function(){
+        var d = ..math.modf(owner.day + 0.5);
+        var f = owner.day + 0.5 - d;
+
+        if(d >= 2299161){
+            var c = ..math.modf((d - 1867216.25) / 36524.25);
+            d += 1 + c - ..math.modf(c * 0.25);
+        }
+        d += 1524;
+        var y = ..math.modf((d - 122.1) / 365.25);
+        d -= ..math.modf(365.25 * y);
+        var m = ..math.modf(d / 30.601);
+        d -= ..math.modf(30.601 * m);
+        if(m > 13){
+            m -= 12;
+        }
+        else {
+            y -= 1;
+        }
+        m -= 1;
+        y -= 4715;
+        f *= 24;
+        var hour = ..math.modf(f);
+
+        f -= hour;
+        f *= 60;
+        var minute = ..math.modf(f);
+
+        f -= minute;
+        f *= 60;
+        var second = ..math.modf(f + 0.5);
+
+        // 这里需要延迟加载 solar 模块
+        import time.tyme.SolarDay;
+        return second < 60 ? ..time.tyme.SolarTime.fromYmdHms(y, m, d, hour, minute, second) 
+                           : ..time.tyme.SolarTime.fromYmdHms(y, m, d, hour, minute, second - 60).next(60);
+    }
+
+    getWeek = function(){
+        import time.tyme.star;
+        return ..time.tyme.Week.fromIndex(..math.modf(owner.day + 0.5) + 7000001 + 1); // 转为 1-based
+    }
+
+    subtract = function(target){
+        return owner.day - target.getDay();
+    }
+}
+
+var JulianDay = JulianDay;
+namespace JulianDay {
+    J2000 = 2451545;
+
+    fromJulianDay = function(day){
+        return JulianDay(day);
+    }
+
+    fromYmdHms = function(year, month, day, hour, minute, second){
+        var y = self.numeric(year, 'year');
+        var m = self.numeric(month, 'month');
+        var h = self.numeric(hour, 'hour');
+        var i = self.numeric(minute, 'minute');
+        var s = self.numeric(second, 'second');
+        var d = self.numeric(day, 'day') + ((s / 60 + i) / 60 + h) / 24;
+        var n = 0;
+        var g = y * 372 + m * 31 + ..math.modf(d) >= 588829;
+        if(m <= 2){
+            m += 12;
+            y--;
+        }
+        if(g){
+            n = ..math.modf(y * 0.01);
+            n = 2 - n + ..math.modf(n * 0.25);
+        }
+        return self.fromJulianDay(..math.modf(365.25 * (y + 4716)) + ..math.modf(30.6001 * (m + 1)) + d + n - 1524.5);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+JulianDay = 儒略日
+JulianDay.J2000 = J2000历元常量(2451545)
+JulianDay.fromJulianDay(.(day) = 根据儒略日数创建儒略日对象\n参数 @day 为儒略日数\n返回儒略日对象
+JulianDay.fromYmdHms(.(year,month,day,hour,minute,second) = 根据年月日时分秒创建儒略日对象\n返回儒略日对象
+end intellisense**/

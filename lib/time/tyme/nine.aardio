@@ -1,0 +1,53 @@
+﻿//Nine 数九
+import time.tyme.base;
+
+namespace time.tyme;
+
+// ========== Nine 数九 ==========
+class Nine {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Nine {
+    NAMES = ['一九', '二九', '三九', '四九', '五九', '六九', '七九', '八九', '九九'];
+
+    fromIndex = function(index){
+        return Nine(self.numeric(index, 'nine index'));
+    }
+
+    fromName = function(name){
+        return Nine(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== NineDay 数九日 ==========
+class NineDay {
+    ctor(nine, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(nine, dayIndex);
+    }
+
+    getNine = function(){
+        return owner.culture;
+    }
+}
+
+namespace NineDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+Nine = 数九
+Nine.fromIndex(.(index) = 根据索引创建数九对象\n参数 @index 为索引值(1-9)\n返回数九对象
+Nine.fromName(.(name) = 根据名称创建数九对象\n参数 @name 为数九名称\n返回数九对象
+NineDay = 数九日
+end intellisense**/

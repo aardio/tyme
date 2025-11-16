@@ -1,0 +1,328 @@
+﻿//festival 节日
+import time.tyme.base;
+import time.tyme.data;
+
+namespace time.tyme.festival{};
+namespace time.tyme;
+
+// ========== LegalHoliday 法定节假日 ==========
+class LegalHoliday {
+    ctor(year, month, day, data){
+        this = ..time.tyme.AbstractTyme();
+        import time.tyme.SolarDay;
+        this.day = ..time.tyme.SolarDay.fromYmd(year, month, day);
+        this.work = ..string.charCodeAt(data, 9) === 48;
+        this.name = self.NAMES[..string.charCodeAt(data, 10) - 48 + 1];
+    }
+
+    getName = function(){
+        return owner.name;
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    isWork = function(){
+        return owner.work;
+    }
+
+    toString = function(){
+        return tostring(owner.day) ++ " " ++ owner.name ++ "(" ++ (owner.work ? "班" : "休") ++ ")";
+    }
+
+    next = function(n){
+        var year = owner.day.getYear();
+        var month = owner.day.getMonth();
+        var day = owner.day.getDay();
+        if(n === 0){
+            return self.fromYmd(year, month, day);
+        }
+        var ys = ..string.format("%04d", year);
+        var ms = (month < 10 ? '0' : '') ++ tostring(month);
+        var ds = (day < 10 ? '0' : '') ++ tostring(day);
+
+        var data = {};
+        var today = ys ++ ms ++ ds;
+        var pattern = ys ++ "\\d{4}[0-1][0-8][+|-]\\d{2}";
+        for matcher in ..string.gmatch(self.DATA, pattern){
+            ..table.push(data, matcher);
+        }
+        var index = 0;
+        var size = #data;
+        for(i=1; size){
+            if(..string.find(data[i], today) === 1){
+                index = i;
+                break;
+            }
+        }
+        if(index === 0){
+            return null;
+        }
+        index += n;
+        var y = year;
+        if(n > 0){
+            while(index > size){
+                index -= size;
+                y += 1;
+                data = {};
+                ys = ..string.format("%04d", y);
+                pattern = ys ++ "\\d{4}[0-1][0-8][+|-]\\d{2}";
+                for matcher in ..string.gmatch(self.DATA, pattern){
+                    ..table.push(data, matcher);
+                }
+                size = #data;
+                if(size < 1){
+                    return null;
+                }
+            }
+        }
+        else {
+            while(index < 1){
+                y -= 1;
+                data = {};
+                ys = ..string.format("%04d", y);
+                pattern = ys ++ "\\d{4}[0-1][0-8][+|-]\\d{2}";
+                for matcher in ..string.gmatch(self.DATA, pattern){
+                    ..table.push(data, matcher);
+                }
+                size = #data;
+                if(size < 1){
+                    return null;
+                }
+                index += size;
+            }
+        }
+        var d = data[index];
+        return LegalHoliday(tonumber(..string.slice(d, 1, 4)), tonumber(..string.slice(d, 5, 6)), tonumber(..string.slice(d, 7, 8)), d);
+    }
+}
+
+namespace LegalHoliday {
+    NAMES = ['元旦节', '春节', '清明节', '劳动节', '端午节', '中秋节', '国庆节', '国庆中秋', '抗战胜利日'];
+    DATA = ..time.tyme._legalHolidayData;
+
+    fromYmd = function(year, month, day){
+        var y = ..string.format("%04d", year);
+        var m = (month < 10 ? '0' : '') ++ tostring(month);
+        var d = (day < 10 ? '0' : '') ++ tostring(day);
+        var matcher = ..string.match(self.DATA, y ++ m ++ d ++ "[0-1][0-8][+|-]\\d{2}");
+        if(!matcher){
+            return null;
+        }
+        return LegalHoliday(year, month, day, matcher);
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== SolarFestival 公历节日 ==========
+class SolarFestival {
+    ctor(typ, day, startYear, data){
+        this = ..time.tyme.AbstractTyme();
+        this.type = typ;
+        this.day = day;
+        this.startYear = startYear;
+        this.index = tonumber(..string.slice(data, 2, 3));
+        this.name = self.NAMES[this.index + 1];
+    }
+
+    getName = function(){
+        return owner.name;
+    }
+
+    getIndex = function(){
+        return owner.index + 1; // 返回 1-based
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    getType = function(){
+        return owner.type;
+    }
+
+    getStartYear = function(){
+        return owner.startYear;
+    }
+
+    toString = function(){
+        return tostring(owner.day) ++ " " ++ owner.name;
+    }
+
+    next = function(n){
+        var size = #self.NAMES;
+        var i = owner.index + n;
+        var newYear = ..math.modf((owner.day.getYear() * size + i) / size);
+        return self.fromIndex(newYear, ..time.tyme.AbstractCulture.indexOf(i, size) + 1);
+    }
+}
+
+namespace SolarFestival {
+    NAMES = ['元旦', '三八妇女节', '植树节', '五一劳动节', '五四青年节', '六一儿童节', '建党节', '八一建军节', '教师节', '国庆节'];
+    DATA = '@00001011950@01003081950@02003121979@03005011950@04005041950@05006011950@06007011941@07008011933@08009101985@09010011950';
+
+    fromIndex = function(year, index){
+        var idx = self.numeric(index, 'solar festival index') - 1; // 转为 0-based
+        if(idx < 0 || idx >= #self.NAMES){
+            error("illegal index: " ++ tostring(index), 2);
+        }
+        var is = (idx < 10 ? '0' : '') ++ tostring(idx);
+        var matcher = ..string.match(self.DATA, "@" ++ is ++ "\\d+");
+        if(matcher){
+            var data = matcher;
+            var typ = ..string.charCodeAt(data, 4) - 48;
+            if(typ === 0){
+                var startYear = tonumber(..string.slice(data, 9));
+                if(year >= startYear){
+                    import time.tyme.SolarDay;
+                    return SolarFestival(..time.tyme.FestivalType.DAY, ..time.tyme.SolarDay.fromYmd(year, tonumber(..string.slice(data, 5, 6)), tonumber(..string.slice(data, 7, 8))), startYear, data);
+                }
+            }
+        }
+        return null;
+    }
+
+    fromYmd = function(year, month, day){
+        var m = (month < 10 ? '0' : '') ++ tostring(month);
+        var d = (day < 10 ? '0' : '') ++ tostring(day);
+        var matcher = ..string.match(self.DATA, "@\\d{2}0" ++ m ++ d ++ "\\d+");
+        if(matcher){
+            var data = matcher;
+            var startYear = tonumber(..string.slice(data, 9));
+            if(year >= startYear){
+                import time.tyme.SolarDay;
+                return SolarFestival(..time.tyme.FestivalType.DAY, ..time.tyme.SolarDay.fromYmd(year, month, day), startYear, data);
+            }
+        }
+        return null;
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+// ========== LunarFestival 农历节日 ==========
+class LunarFestival {
+    ctor(typ, day, solarTerm, data){
+        this = ..time.tyme.AbstractTyme();
+        this.type = typ;
+        this.day = day;
+        this.solarTerm = solarTerm;
+        this.index = tonumber(..string.slice(data, 2, 3));
+        this.name = self.NAMES[this.index + 1];
+    }
+
+    getName = function(){
+        return owner.name;
+    }
+
+    getIndex = function(){
+        return owner.index + 1; // 返回 1-based
+    }
+
+    getDay = function(){
+        return owner.day;
+    }
+
+    getType = function(){
+        return owner.type;
+    }
+
+    getSolarTerm = function(){
+        return owner.solarTerm;
+    }
+
+    toString = function(){
+        return tostring(owner.day) ++ " " ++ owner.name;
+    }
+
+    next = function(n){
+        var size = #self.NAMES;
+        var i = owner.index + n;
+        var newYear = ..math.modf((owner.day.getYear() * size + i) / size);
+        return self.fromIndex(newYear, ..time.tyme.AbstractCulture.indexOf(i, size) + 1);
+    }
+}
+
+namespace LunarFestival {
+    NAMES = ['春节', '元宵节', '龙头节', '上巳节', '清明节', '端午节', '七夕节', '中元节', '中秋节', '重阳节', '冬至节', '腊八节', '除夕'];
+    DATA = '@0000101@0100115@0200202@0300303@04107@0500505@0600707@0700715@0800815@0900909@10124@1101208@122';
+
+    fromIndex = function(year, index){
+        var idx = self.numeric(index, 'lunar festival index') - 1; // 转为 0-based
+        if(idx < 0 || idx >= #self.NAMES){
+            error("illegal index: " ++ tostring(index), 2);
+        }
+        var is = (idx < 10 ? '0' : '') ++ tostring(idx);
+        var matcher = ..string.match(self.DATA, "@" ++ is ++ "\\d+");
+        if(matcher){
+            var data = matcher;
+            var typ = ..string.charCodeAt(data, 4) - 48;
+            select(typ){
+                case 0 {
+                    import time.tyme.LunarDay;
+                    return LunarFestival(..time.tyme.FestivalType.DAY, ..time.tyme.LunarDay.fromYmd(year, tonumber(..string.slice(data, 5, 6)), tonumber(..string.slice(data, 7))), null, data);
+                }
+                case 1 {
+                    import time.tyme.SolarTerm;
+                    var solarTerm = ..time.tyme.SolarTerm.fromIndex(year, tonumber(..string.slice(data, 5)) + 1); // 转为 1-based
+                    return LunarFestival(..time.tyme.FestivalType.TERM, solarTerm.getSolarDay().getLunarDay(), solarTerm, data);
+                }
+                case 2 {
+                    import time.tyme.LunarDay;
+                    return LunarFestival(..time.tyme.FestivalType.EVE, ..time.tyme.LunarDay.fromYmd(year + 1, 1, 1).next(-1), null, data);
+                }
+            }
+        }
+        return null;
+    }
+
+    fromYmd = function(year, month, day){
+        var m = (month < 10 ? '0' : '') ++ tostring(month);
+        var d = (day < 10 ? '0' : '') ++ tostring(day);
+        var matcher = ..string.match(self.DATA, "@\\d{2}0" ++ m ++ d);
+        if(matcher){
+            import time.tyme.LunarDay;
+            return LunarFestival(..time.tyme.FestivalType.DAY, ..time.tyme.LunarDay.fromYmd(year, month, day), null, matcher);
+        }
+
+        for matcher in ..string.gmatch(self.DATA, "@\\d{2}1\\d{2}"){
+            var data = matcher;
+            import time.tyme.SolarTerm;
+            var termIndex = tonumber(..string.slice(data, 5)) + 1; // 转为 1-based
+            var solarTerm = ..time.tyme.SolarTerm.fromIndex(year, termIndex);
+            var lunarDay = solarTerm.getSolarDay().getLunarDay();
+            if(lunarDay.getYear() === year && lunarDay.getMonth() === month && lunarDay.getDay() === day){
+                return LunarFestival(..time.tyme.FestivalType.TERM, lunarDay, solarTerm, data);
+            }
+        }
+
+        matcher = ..string.match(self.DATA, "@\\d{2}2");
+        if(matcher){
+            import time.tyme.LunarDay;
+            var lunarDay = ..time.tyme.LunarDay.fromYmd(year, month, day);
+            var nextDay = lunarDay.next(1);
+            if(nextDay.getMonth() === 1 && nextDay.getDay() === 1){
+                return LunarFestival(..time.tyme.FestivalType.EVE, lunarDay, null, matcher);
+            }
+        }
+        return null;
+    }
+
+    indexOf = ..time.tyme.AbstractTyme.indexOf;
+    numeric = ..time.tyme.AbstractTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+LegalHoliday = 法定节假日
+LegalHoliday.fromYmd(.(year,month,day) = 根据年月日获取法定节假日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节假日对象或null
+SolarFestival = 公历节日
+SolarFestival.fromIndex(.(year,index) = 根据年份和索引创建公历节日对象\n参数 @year 为年份\n参数 @index 为节日索引(1-10)\n返回节日对象或null
+SolarFestival.fromYmd(.(year,month,day) = 根据年月日获取公历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
+LunarFestival = 农历节日
+LunarFestival.fromIndex(.(year,index) = 根据年份和索引创建农历节日对象\n参数 @year 为年份\n参数 @index 为节日索引(1-13)\n返回节日对象或null
+LunarFestival.fromYmd(.(year,month,day) = 根据年月日获取农历节日\n参数 @year 为年份\n参数 @month 为月份\n参数 @day 为日期\n返回节日对象或null
+end intellisense**/

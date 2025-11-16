@@ -1,0 +1,41 @@
+﻿//HideHeavenStemDay 藏干日
+import time.tyme.base;
+import time.tyme.HeavenStem;
+
+namespace time.tyme;
+
+// ========== HideHeavenStemDay 藏干日 ==========
+class HideHeavenStemDay {
+    ctor(hideHeavenStem, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(hideHeavenStem, dayIndex);
+    }
+
+    getHideHeavenStem = function(){
+        return owner.culture;
+    }
+
+    getName = function(){
+        var heavenStem = owner.getHideHeavenStem().getHeavenStem();
+        return heavenStem.getName() ++ heavenStem.getElement().getName();
+    }
+
+    toString = function(){
+        return owner.getName() ++ "第" ++ tostring(owner.getDayIndex()) ++ "天";
+    }
+}
+
+namespace HideHeavenStemDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+HideHeavenStemDay = 藏干日
+end intellisense**/
+
+/**intellisense(time.tyme.HideHeavenStemDay.HideHeavenStemDay)
+getHideHeavenStem() = 获取藏干对象
+getName() = 获取名称
+getDayIndex() = 获取天数索引(1-based)
+toString() = 转为字符串
+end intellisense**/

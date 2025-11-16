@@ -1,0 +1,328 @@
+﻿//base 基础类
+namespace time.tyme.base{};
+namespace time.tyme;
+
+YinYang = {
+    YIN = 0;
+    YANG = 1;
+}
+
+Side = {
+    IN = 0;
+    OUT = 1;
+}
+
+Gender = {
+    WOMAN = 0;
+    MAN = 1;
+}
+
+FestivalType = {
+    DAY = 0;
+    TERM = 1;
+    EVE = 2;
+}
+
+HideHeavenStemType = {
+    RESIDUAL = 0;
+    MIDDLE = 1;
+    MAIN = 2;
+}
+
+// ========== 抽象基类 ==========
+class AbstractCulture {
+    getName = function(){
+        error("abstract method", 2);
+    }
+
+    toString = function(){
+        return this.getName();
+    }
+
+    equals = function(o){
+        return o && tostring(o) === tostring(this);
+    }
+
+    @_meta;
+}
+
+var AbstractCulture = AbstractCulture;
+namespace AbstractCulture {
+    _meta = {
+        _tostring = lambda() owner.toString();
+    }
+
+    // 内部使用 0-based 索引
+    indexOf = function(index, size){
+        var i = index % size;
+        if(i < 0){
+            i += size;
+        }
+        return i;
+    }
+
+    numeric = function(n, name){
+        var d = tonumber(n);
+        if(d === null){
+            error("illegal " ++ name ++ ": " ++ tostring(n), 2);
+        }
+        return d;
+    }
+}
+
+class AbstractTyme {
+    ctor(){
+        this = AbstractCulture();
+    }
+
+    next = function(n){
+        error("abstract method", 2);
+    }
+}
+
+var AbstractTyme = AbstractTyme;
+namespace AbstractTyme {
+    indexOf = AbstractCulture.indexOf;
+    numeric = AbstractCulture.numeric;
+}
+
+class AbstractCultureDay {
+    ctor(culture, dayIndex){
+        this = AbstractCulture();
+        this.culture = culture;
+        this.dayIndex = dayIndex; // 内部使用 0-based
+    }
+
+    getDayIndex = function(){
+        return this.dayIndex + 1; // 返回 1-based
+    }
+
+    getCulture = function(){
+        return this.culture;
+    }
+
+    getName = function(){
+        return this.culture.getName();
+    }
+
+    toString = function(){
+        return tostring(this.culture) ++ "第" ++ tostring(this.getDayIndex()) ++ "天";
+    }
+}
+
+namespace AbstractCultureDay {
+    indexOf = AbstractCulture.indexOf;
+    numeric = AbstractCulture.numeric;
+}
+
+// ========== LoopTyme 循环类型基类 ==========
+class LoopTyme {
+    ctor(names, indexOrName){
+        this = AbstractTyme();
+        this.names = names;
+
+        // 内部索引转换函数，返回 0-based 索引
+        this.indexOfBy = function(indexOrName){
+            if(type(indexOrName) == "number"){
+                // fromIndex 传入的是 1-based，需要减 1
+                return indexOf(indexOrName - 1, #owner.names);
+            }
+            else {
+                for(i=1; #owner.names){
+                    if(owner.names[i] === indexOrName){
+                        return i - 1; // 返回 0-based
+                    }
+                }
+                error("illegal name " ++ indexOrName, 2);
+            }
+        }
+
+        this.index = this.indexOfBy(indexOrName);
+    }
+
+    getName = function(){
+        return this.names[this.index + 1]; // 0-based 转 1-based 访问
+    }
+
+    getIndex = function(){
+        return this.index + 1; // 返回 1-based 索引
+    }
+
+    getSize = function(){
+        return #this.names;
+    }
+
+    nextIndex = function(n){
+        // 内部 0-based 计算后，转为 1-based 调用 indexOfBy
+        return owner.indexOfBy(owner.index + n + 1);
+    }
+
+    stepsTo = function(targetIndex){
+        // targetIndex 是 1-based，需要减 1
+        return owner.indexOfBy(targetIndex - owner.index);
+    }
+}
+
+namespace LoopTyme {
+    indexOf = AbstractTyme.indexOf;
+    numeric = AbstractTyme.numeric;
+}
+
+
+// ========== Twenty 二十运 ==========
+class Twenty {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+
+    getSixty = function(){
+        return Sixty.fromIndex(..math.modf(owner.index / 3) + 1);
+    }
+}
+
+namespace Twenty {
+    NAMES = ['一运', '二运', '三运', '四运', '五运', '六运', '七运', '八运', '九运'];
+
+    fromIndex = function(index){
+        return Twenty(self.numeric(index, 'twenty index'));
+    }
+
+    fromName = function(name){
+        return Twenty(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== Sixty 三元 ==========
+class Sixty {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return self.fromIndex(owner.nextIndex(n));
+    }
+}
+
+namespace Sixty {
+    NAMES = ['上元', '中元', '下元'];
+
+    fromIndex = function(index){
+        return Sixty(self.numeric(index, 'sixty index'));
+    }
+
+    fromName = function(name){
+        return Sixty(name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== KitchenGodSteed 灶马头 ==========
+class KitchenGodSteed {
+    ctor(lunarYear){
+        this = ..time.tyme.AbstractCulture();
+        import time.tyme.LunarDay;
+        this.firstDaySixtyCycle = ..time.tyme.LunarDay.fromYmd(lunarYear, 1, 1).getSixtyCycle();
+    }
+
+    byHeavenStem = function(n){
+        // n 是 1-based 天干索引
+        return self.NUMBERS[owner.firstDaySixtyCycle.getHeavenStem().stepsTo(n)];
+    }
+
+    byEarthBranch = function(n){
+        // n 是 1-based 地支索引
+        return self.NUMBERS[owner.firstDaySixtyCycle.getEarthBranch().stepsTo(n)];
+    }
+
+    getMouse = function(){
+        return owner.byEarthBranch(1) ++ "鼠偷粮"; // 子
+    }
+
+    getGrass = function(){
+        return "草子" ++ owner.byEarthBranch(1) ++ "分";
+    }
+
+    getCattle = function(){
+        return owner.byEarthBranch(2) ++ "牛耕田"; // 丑
+    }
+
+    getFlower = function(){
+        return "花收" ++ owner.byEarthBranch(4) ++ "分"; // 卯
+    }
+
+    getDragon = function(){
+        return owner.byEarthBranch(5) ++ "龙治水"; // 辰
+    }
+
+    getHorse = function(){
+        return owner.byEarthBranch(7) ++ "马驮谷"; // 午
+    }
+
+    getChicken = function(){
+        return owner.byEarthBranch(10) ++ "鸡抢米"; // 酉
+    }
+
+    getSilkworm = function(){
+        return owner.byEarthBranch(10) ++ "姑看蚕";
+    }
+
+    getPig = function(){
+        return owner.byEarthBranch(12) ++ "屠共猪"; // 亥
+    }
+
+    getField = function(){
+        return "甲田" ++ owner.byHeavenStem(1) ++ "分"; // 甲
+    }
+
+    getCake = function(){
+        return owner.byHeavenStem(3) ++ "人分饼"; // 丙
+    }
+
+    getGold = function(){
+        return owner.byHeavenStem(8) ++ "日得金"; // 辛
+    }
+
+    getPeopleCakes = function(){
+        return owner.byEarthBranch(3) ++ "人" ++ owner.byHeavenStem(3) ++ "丙"; // 寅、丙
+    }
+
+    getPeopleHoes = function(){
+        return owner.byEarthBranch(3) ++ "人" ++ owner.byHeavenStem(4) ++ "锄"; // 寅、丁
+    }
+
+    getName = function(){
+        return '灶马头';
+    }
+}
+
+namespace KitchenGodSteed {
+    NUMBERS = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
+
+    fromLunarYear = function(lunarYear){
+        return KitchenGodSteed(lunarYear);
+    }
+
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+/**intellisense(time.tyme)
+YinYang = 阴阳枚举\n@.YIN=阴(0)\n@.YANG=阳(1)
+Side = 方位枚举\n@.IN=内(0)\n@.OUT=外(1)
+Gender = 性别枚举\n@.WOMAN=女(0)\n@.MAN=男(1)
+FestivalType = 节日类型枚举\n@.DAY=日期型(0)\n@.TERM=节气型(1)\n@.EVE=除夕型(2)
+HideHeavenStemType = 藏干类型枚举\n@.RESIDUAL=余气(0)\n@.MIDDLE=中气(1)\n@.MAIN=本气(2)
+AbstractCulture = 抽象文化类基类
+AbstractTyme = 抽象时间类基类
+AbstractCultureDay = 抽象文化日类基类
+LoopTyme = 循环类型基类
+end intellisense**/

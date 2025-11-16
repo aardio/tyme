@@ -1,0 +1,167 @@
+﻿//fetus 胎神
+import time.tyme.base;
+import time.tyme.HeavenStem;
+import time.tyme.Element;
+
+namespace time.tyme.fetus{};
+namespace time.tyme;
+
+// ========== FetusHeavenStem 胎神天干 ==========
+class FetusHeavenStem {
+    ctor(index){
+        this = ..time.tyme.LoopTyme(self.NAMES, index);
+    }
+
+    next = function(n){
+        return FetusHeavenStem(owner.nextIndex(n));
+    }
+}
+
+namespace FetusHeavenStem {
+    NAMES = ['门', '碓磨', '厨灶', '仓库', '房床'];
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== FetusEarthBranch 胎神地支 ==========
+class FetusEarthBranch {
+    ctor(index){
+        this = ..time.tyme.LoopTyme(self.NAMES, index);
+    }
+
+    next = function(n){
+        return FetusEarthBranch(owner.nextIndex(n));
+    }
+}
+
+namespace FetusEarthBranch {
+    NAMES = ['碓', '厕', '炉', '门', '栖', '床'];
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== FetusDay 胎神日 ==========
+class FetusDay {
+    ctor(sixtyCycle){
+        this = ..time.tyme.AbstractCulture();
+        // 注意：这里使用 0-based index 进行模运算
+        this.fetusHeavenStem = FetusHeavenStem(..time.tyme.AbstractCulture.indexOf(sixtyCycle.getHeavenStem().index, 5) + 1);
+        this.fetusEarthBranch = FetusEarthBranch(..time.tyme.AbstractCulture.indexOf(sixtyCycle.getEarthBranch().index, 6) + 1);
+
+        // 方位映射表 (1-based 数据)
+        var indices = [
+            4,4,9,9,9,9,9,2,2,2,2,2,2,7,7,7,7,7,6,6,6,6,6,6,1,1,1,1,1,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,0,0,8,8,8,8,8,8,3,3,3,3,3,4,4,4,4
+        ];
+        var index = indices[sixtyCycle.index + 1];
+
+        if(index === 0){
+            this.side = ..time.tyme.Side.IN;
+            // 对于内部方位，需要特殊处理
+            var innerIndices = [0,0,0,0,0,6,6,2,2,2,4,8,8,8,8,6];
+            var innerIndex = innerIndices[sixtyCycle.index - 28];
+            this.direction = innerIndex === 0 ? null : ..time.tyme.Direction.fromIndex(innerIndex);
+        }
+        else {
+            this.side = ..time.tyme.Side.OUT;
+            this.direction = ..time.tyme.Direction.fromIndex(index);
+        }
+    }
+
+    getName = function(){
+        var s = owner.fetusHeavenStem.getName() ++ owner.fetusEarthBranch.getName();
+        if(s === '门门'){
+            s = '占大门';
+        }
+        elseif(s === '碓磨碓'){
+            s = '占碓磨';
+        }
+        elseif(s === '房床床'){
+            s = '占房床';
+        }
+        elseif(..string.find(s, '门') == 1){
+            s = '占' ++ s;
+        }
+
+        s ++= ' ';
+
+        if(..time.tyme.Side.IN == owner.side){
+            s ++= '房内';
+        }
+        else {
+            s ++= '外';
+        }
+
+        if(owner.direction){
+            var directionName = owner.direction.getName();
+            if(..time.tyme.Side.OUT == owner.side && ..string.find('北南西东', directionName)){
+                s ++= '正';
+            }
+            s ++= directionName;
+        }
+        return s;
+    }
+
+    getSide = function(){
+        return owner.side;
+    }
+
+    getDirection = function(){
+        return owner.direction;
+    }
+
+    getFetusHeavenStem = function(){
+        return owner.fetusHeavenStem;
+    }
+
+    getFetusEarthBranch = function(){
+        return owner.fetusEarthBranch;
+    }
+}
+
+namespace FetusDay {
+    fromLunarDay = function(lunarDay){
+        return FetusDay(lunarDay.getSixtyCycle());
+    }
+
+    fromSixtyCycleDay = function(sixtyCycleDay){
+        return FetusDay(sixtyCycleDay.getSixtyCycle());
+    }
+
+    indexOf = ..time.tyme.AbstractCulture.indexOf;
+    numeric = ..time.tyme.AbstractCulture.numeric;
+}
+
+// ========== FetusMonth 胎神月 ==========
+class FetusMonth {
+    ctor(indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+    }
+
+    next = function(n){
+        return FetusMonth(owner.nextIndex(n));
+    }
+}
+
+namespace FetusMonth {
+    NAMES = ['占房床', '占户窗', '占门堂', '占厨灶', '占房床', '占床仓', '占碓磨', '占厕户', '占门房', '占房床', '占灶炉', '占房床'];
+
+    fromLunarMonth = function(lunarMonth){
+        return lunarMonth.isLeap() ? null : FetusMonth(lunarMonth.getMonth());
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+/**intellisense(time.tyme)
+FetusHeavenStem = 胎神天干
+FetusEarthBranch = 胎神地支
+FetusDay = 胎神日
+FetusDay.fromLunarDay(.(lunarDay) = 根据农历日创建胎神日对象\n参数 @lunarDay 为农历日对象\n返回胎神日对象
+FetusDay.fromSixtyCycleDay(.(sixtyCycleDay) = 根据干支日创建胎神日对象\n参数 @sixtyCycleDay 为干支日对象\n返回胎神日对象
+FetusMonth = 胎神月
+FetusMonth.fromLunarMonth(.(lunarMonth) = 根据农历月创建胎神月对象\n参数 @lunarMonth 为农历月对象\n返回胎神月对象(闰月返回null)
+end intellisense**/

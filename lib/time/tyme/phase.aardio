@@ -1,0 +1,120 @@
+﻿//Phase 月相
+
+import time.tyme.base;
+import time.tyme.JulianDay;
+import time.tyme.ShouXingUtil;
+
+namespace time.tyme;
+
+// ========== Phase 月相 ==========
+class Phase {
+    ctor(lunarYear, lunarMonth, indexOrName){
+        this = ..time.tyme.LoopTyme(self.NAMES, indexOrName);
+        if(type(indexOrName) == "number"){
+            import time.tyme.LunarDay;
+            // indexOrName 是 1-based，需要减 1 参与计算
+            var m = ..time.tyme.LunarMonth.fromYm(lunarYear, lunarMonth).next(..math.modf((indexOrName - 1) / this.getSize()));
+            this.lunarYear = m.getYear();
+            this.lunarMonth = m.getMonthWithLeap();
+        }
+        else {
+            this.lunarYear = self.numeric(lunarYear, 'lunar year');
+            this.lunarMonth = self.numeric(lunarMonth, 'lunar month');
+        }
+    }
+
+    next = function(n){
+        var size = owner.getSize();
+        var i = owner.index + n; // 0-based 计算
+        if(i < 0){
+            i -= size;
+        }
+        i = ..math.modf(i / size);
+
+        import time.tyme.LunarDay;
+        var m = ..time.tyme.LunarMonth.fromYm(owner.lunarYear, owner.lunarMonth);
+        if(i != 0){
+            m = m.next(i);
+        }
+        return self.fromIndex(m.getYear(), m.getMonthWithLeap(), ..time.tyme.AbstractCulture.indexOf(owner.index + n, size) + 1);
+    }
+
+    getStartSolarTime = function(){
+        import time.tyme.LunarDay;
+
+        var n = ..math.floor((owner.lunarYear - 2000) * 365.2422 / 29.53058886);
+        var i = 0;
+        var jd = ..time.tyme.JulianDay.J2000 + ..time.tyme.ShouXingUtil.ONE_THIRD;
+        var d = ..time.tyme.LunarDay.fromYmd(owner.lunarYear, owner.lunarMonth, 1).getSolarDay();
+
+        while(true){
+            var t = ..time.tyme.ShouXingUtil.msaLonT((n + i) * ..time.tyme.ShouXingUtil.PI_2) * 36525;
+            if(!..time.tyme.JulianDay.fromJulianDay(jd + t - ..time.tyme.ShouXingUtil.dtT(t)).getSolarDay().isBefore(d)){
+                break;
+            }
+            i++;
+        }
+        var r = [0, 90, 180, 270];
+        t = ..time.tyme.ShouXingUtil.msaLonT((n + i + r[..math.modf(owner.index / 2) + 1] / 360.0) * ..time.tyme.ShouXingUtil.PI_2) * 36525;
+        return ..time.tyme.JulianDay.fromJulianDay(jd + t - ..time.tyme.ShouXingUtil.dtT(t)).getSolarTime();
+    }
+
+    getSolarTime = function(){
+        var t = owner.getStartSolarTime();
+        return owner.index % 2 == 1 ? t.next(1) : t;
+    }
+
+    getSolarDay = function(){
+        var d = owner.getStartSolarTime().getSolarDay();
+        return owner.index % 2 == 1 ? d.next(1) : d;
+    }
+}
+
+namespace Phase {
+    NAMES = ['新月', '蛾眉月', '上弦月', '盈凸月', '满月', '亏凸月', '下弦月', '残月'];
+
+    fromIndex = function(lunarYear, lunarMonth, index){
+        return Phase(lunarYear, lunarMonth, self.numeric(index, 'phase index'));
+    }
+
+    fromName = function(lunarYear, lunarMonth, name){
+        return Phase(lunarYear, lunarMonth, name);
+    }
+
+    indexOf = ..time.tyme.LoopTyme.indexOf;
+    numeric = ..time.tyme.LoopTyme.numeric;
+}
+
+// ========== PhaseDay 月相日 ==========
+class PhaseDay {
+    ctor(phase, dayIndex){
+        this = ..time.tyme.AbstractCultureDay(phase, dayIndex);
+    }
+
+    getPhase = function(){
+        return owner.culture;
+    }
+}
+
+namespace PhaseDay {
+    indexOf = ..time.tyme.AbstractCultureDay.indexOf;
+    numeric = ..time.tyme.AbstractCultureDay.numeric;
+}
+
+/**intellisense(time.tyme)
+Phase = 月相
+Phase.fromIndex(.(lunarYear,lunarMonth,index) = 根据农历年月和索引创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @index 为月相索引(1-8)\n返回月相对象
+Phase.fromName(.(lunarYear,lunarMonth,name) = 根据农历年月和名称创建月相对象\n参数 @lunarYear 为农历年\n参数 @lunarMonth 为农历月\n参数 @name 为月相名称\n返回月相对象
+PhaseDay = 月相日
+end intellisense**/
+
+/**intellisense(time.tyme.Phase.Phase)
+fromIndex(.(lunarYear,lunarMonth,index) = 根据农历年月和索引创建月相对象
+fromName(.(lunarYear,lunarMonth,name) = 根据农历年月和名称创建月相对象
+next(.(n) = 获取偏移n个月相的月相对象
+getSolarTime() = 获取月相时刻的公历时间对象
+getSolarDay() = 获取月相时刻的公历日对象
+getName() = 获取月相名称
+getIndex() = 获取月相索引(1-based)
+toString() = 转为字符串
+end intellisense**/

@@ -1,64 +1,128 @@
 import console;
 import time.tyme;
 
-var JulianDay = time.tyme.JulianDay;
 var SolarDay = time.tyme.SolarDay;
-var SolarTerm = time.tyme.SolarTerm;
-var ShouXingUtil = time.tyme.ShouXingUtil;
-var LunarYear = time.tyme.LunarYear;
-var LunarMonth = time.tyme.LunarMonth;
 
-if(SolarDay.fromYmd(2023, 1, 1).getJulianDay().getSolarDay().toString() !== '2023年1月1日'){
-  error('expect :2023年1月1日\nactual: ' ++ SolarDay.fromYmd(2023, 1, 1).getJulianDay().getSolarDay().toString(), 2);
-}
+// 公历转农历
+var solarDay = SolarDay.fromYmd(2024, 1, 1);
+console.log("公历:", solarDay);
 
-var term = SolarTerm.fromName(2023, '冬至');
-if(term.getName() !== '冬至'){
-  error('expect :冬至\nactual: ' ++ term.getName(), 2);
-}
-if(term.getIndex() !== 0){
-  error('expect :0\nactual: ' ++ tostring(term.getIndex()), 2);
-}
-if(term.getJulianDay().getSolarDay().toString() !== '2022年12月22日'){
-  error('expect :2022年12月22日\nactual: ' ++ term.getJulianDay().getSolarDay().toString(), 2);
-}
-if(term.getSolarDay().toString() !== '2022年12月22日'){
-  error('expect :2022年12月22日\nactual: ' ++ term.getSolarDay().toString(), 2);
-}
+var lunarDay = solarDay.getLunarDay();
+console.log("农历:", lunarDay);
+console.log("干支:", lunarDay.getSixtyCycle());
+console.log("生肖:", lunarDay.getLunarMonth().getLunarYear().getSixtyCycle().getEarthBranch().getZodiac());
 
-if(SolarTerm.fromName(1034, "寒露").getSolarDay().toString() !== '1034年10月1日'){
-  error('expect :1034年10月1日\nactual: ' ++ SolarTerm.fromName(1034, "寒露").getSolarDay().toString(), 2);
-}
-if(SolarTerm.fromName(1034, "寒露").getJulianDay().getSolarDay().toString() !== '1034年10月3日'){
-  error('expect :1034年10月3日\nactual: ' ++ SolarTerm.fromName(1034, "寒露").getJulianDay().getSolarDay().toString(), 2);
-}
-if(SolarTerm.fromName(1034, "寒露").getJulianDay().getSolarTime().toString() !== '1034年10月3日 06:02:28'){
-  error('expect :1034年10月3日 06:02:28\nactual: ' ++ SolarTerm.fromName(1034, "寒露").getJulianDay().getSolarTime().toString(), 2);
-}
- 
-var solar = SolarDay.fromYmd(1986, 5, 29);
-if(solar.toString() !== '1986年5月29日'){
-  error('expect :1986年5月29日\nactual: ' ++ solar.toString(), 2);
+// 节气
+var term = solarDay.getTerm();
+console.log("节气:", term);
+
+// 星期
+console.log("星期:", solarDay.getWeek());
+
+// 星座
+console.log("星座:", solarDay.getConstellation());
+
+// 宜忌
+var recommends = lunarDay.getRecommends();
+console.log("宜:");
+for(i=1; #recommends){
+    console.log("  ", recommends[i]);
 }
 
-solar = SolarDay.fromYmd(1582, 10, 15);
-if(solar.next(-1).toString() !== '1582年10月4日'){
-  error('expect:1582年10月4日\nactual: ' ++ solar.next(-1).toString(), 2);
+var avoids = lunarDay.getAvoids();
+console.log("忌:");
+for(i=1; #avoids){
+    console.log("  ", avoids[i]);
 }
 
-if(LunarYear.fromYear(2359).getLeapMonth() !== 7){
-  error('expect:7\nactual: ' ++ tostring(LunarYear.fromYear(2359).getLeapMonth()), 2);
+// 八字
+var SolarTime = time.tyme.SolarTime;
+var solarTime = SolarTime.fromYmdHms(1990, 5, 15, 14, 30, 0);
+var lunarHour = solarTime.getLunarHour();
+var eightChar = lunarHour.getEightChar();
+console.log('\n八字:', eightChar);
+console.log("年柱:", eightChar.getYear());
+console.log("月柱:", eightChar.getMonth());
+console.log("日柱:", eightChar.getDay());
+console.log("时柱:", eightChar.getHour());
+
+// 童限
+var ChildLimit = time.tyme.ChildLimit;
+var childLimit = ChildLimit.fromSolarTime(solarTime, time.tyme.Gender.MAN);
+console.log('\n童限:', childLimit);
+console.log("起运:", childLimit.getYearCount(), "年", childLimit.getMonthCount(), "月", childLimit.getDayCount(), "日");
+
+// 大运
+var decadeFortune = childLimit.getStartDecadeFortune();
+console.log("第一步大运:", decadeFortune);
+console.log("起始年龄:", decadeFortune.getStartAge());
+console.log("结束年龄:", decadeFortune.getEndAge());
+
+// 藏历
+var rabByungDay = solarDay.getRabByungDay();
+console.log('\n藏历:', rabByungDay);
+
+// 法定节假日
+var holiday = solarDay.getLegalHoliday();
+if(holiday){
+    console.log("法定节假日:", holiday);
 }
 
-if(LunarMonth.fromYm(2359, 7).getName() !== '七月'){
-  error('expect:七月\nactual: ' ++ LunarMonth.fromYm(2359, 7).getName(), 2);
+// 公历节日
+var festival = solarDay.getFestival();
+if(festival){
+    console.log("公历节日:", festival);
 }
 
-solar = SolarDay.fromYmd(2020, 5, 24);
-if(solar.getLunarDay().toString() !== '农历庚子年闰四月初二'){
-  error('expect: 农历庚子年闰四月初二\nactual: ' ++ solar.getLunarDay().toString(), 2);
+// 农历节日
+var lunarFestival = lunarDay.getFestival();
+if(lunarFestival){
+    console.log("农历节日:", lunarFestival);
 }
- 
-console.log( 'test success' );
+
+// 月相
+var phase = lunarDay.getPhase();
+console.log('\n月相:', phase);
+
+// 物候
+var phenology = solarDay.getPhenology();
+console.log("物候:", phenology);
+
+// 三伏
+var dogDay = solarDay.getDogDay();
+if(dogDay){
+    console.log("三伏:", dogDay);
+}
+
+// 梅雨
+var plumRainDay = solarDay.getPlumRainDay();
+if(plumRainDay){
+    console.log("梅雨:", plumRainDay);
+}
+
+// 数九
+var nineDay = solarDay.getNineDay();
+if(nineDay){
+    console.log("数九:", nineDay);
+}
+
+// 胎神
+var fetusDay = lunarDay.getFetusDay();
+console.log("\n胎神:", fetusDay);
+
+// 九星
+console.log("九星:", lunarDay.getNineStar());
+
+// 二十八宿
+console.log("二十八宿:", lunarDay.getTwentyEightStar());
+
+// 建除十二值神
+console.log("值神:", lunarDay.getDuty());
+
+// 黄道黑道十二神
+console.log("十二神:", lunarDay.getTwelveStar());
+
+// 六曜
+console.log("六曜:", lunarDay.getSixStar());
 
 console.pause();
