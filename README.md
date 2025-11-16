@@ -15,13 +15,13 @@ var SolarDay = time.tyme.SolarDay;
 var solar = SolarDay.fromYmd( time() );
 
 // 也可以传入指定 year, month, day 字段的表对象
-solar = SolarDay.fromYmd( year = 1986,month=5,day=29 );
+solar = SolarDay.fromYmd( year=1986, month=5, day=29 );
 
 // 指定年月日参数，创建公历日对象
 solar = SolarDay.fromYmd(1986, 5, 29);
 
 // 所有 tyme 对象基本都可以用 tostring 转换为字符串
-var str = tostring(solar);
+var str = tostring( solar );
 
 // 1986年5月29日
 console.log( solar ); // console.log 参数自动调用 tostring 
