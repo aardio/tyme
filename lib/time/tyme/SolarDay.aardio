@@ -651,7 +651,16 @@ class SolarDay {
 
     getFestival = function(){
         import time.tyme.festival;
-        return ..time.tyme.SolarFestival.fromYmd(owner.getYear(), owner.getMonth(), owner.day);
+        
+        var y,m,d = owner.getYear(), owner.getMonth(), owner.day;
+        var f = ..time.tyme.SolarFestival.fromYmd(y,m,d);
+   		if( f ) return f;
+   		 
+   		var f = ..time.tyme.WeekFestival.fromYmd(y,m,d);
+    	if(f) return f;
+    
+   		var f = ..time.tyme.OtherFestival.fromYmd(y,m,d);
+    	if(f && #f) return f[1];
     }
 
     getPhaseDay = function(){
